@@ -1,0 +1,21 @@
+{% extends 'Sale/base.html' %}
+{% load static %}
+{% block title %}添加预约{% endblock %}
+
+{% block script %}
+    <script>
+        function checkInput() {
+            var name = document.getElementById("inputName").value;
+            if (name == "") {
+                alert("姓名不能为空");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
+{% endblock %}
+{% block content %}
+
+{% endblock %}

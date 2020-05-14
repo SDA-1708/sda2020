@@ -1,0 +1,76 @@
+{#{% extends "welcome/base.html" %}#}
+{#{% load static %}#}
+{#{% block title %}重置密码{% endblock %}#}
+{#{% block css %}#}
+{#    <link rel="stylesheet" href="{% static 'welcome/css/login.css' %}">#}
+{#{% endblock %}#}
+{##}
+{##}
+{#{% block content %}#}
+{#<div class="container">#}
+{#    <div class="row">#}
+{#        <div class="col-12">#}
+{#            <input type="button" id="emailconfirm" value="send Email">#}
+{#        </div>#}
+{#        <div id="re"></div>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#   <script>#}
+{#   $('#emailconfirm').click(function () {#}
+{#       $.ajax({#}
+{#           url:{% url 'reset_psd_send' %},#}
+{#           method: 'POST',#}
+{#           data:{'csrfmiddlewaretoken':'{{ csrf_token }}' },#}
+{#           success:function (data) {#}
+{#               alert(data.message);#}
+{#               document.getElementById('re').innerHTML = data.message;#}
+{#           }#}
+{#       });#}
+{#   })#}
+{#   </script>#}
+{#{% endblock %}#}
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>更改密码</title>
+{#    <link href="favicon.ico" rel="shortcut icon" />#}
+    <link href="{% static 'welcome/css/bootstrap.css' %}" rel='stylesheet' type='text/css' />
+
+    <script src="{% static 'welcome/js/jquery.min.js' %}"></script>
+    <script src="{% static 'welcome/js/bootstrap.js' %}"></script>
+
+
+    <script>
+        function confirm() {
+            $.ajax({
+                url:{% url 'welcome:reset_psd_send' %},
+                method: 'POST',
+                data:{'csrfmiddlewaretoken':'{{ csrf_token }}' },
+                success:function (data) {
+                    alert(data.message);
+                    document.getElementById('re').innerHTML = data.message;
+                }
+            });
+        }
+    </script>
+</head>
+<body style=" background: url(http://global.bing.com/az/hprichbg/rb/RavenWolf_EN-US4433795745_1920x1080.jpg) no-repeat center center fixed; background-size: 100%;">
+    <div class="modal-dialog" style="margin-top: 10%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center" id="myModalLabel">徳旭4S欢迎您</h4>
+            </div>
+            <div class="modal-body" id = "model-body">
+                <p id="re">请您点击下方按钮发送验证邮件</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default form-control" onclick="confirm()">立刻登陆</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+
+</body>
+</html>

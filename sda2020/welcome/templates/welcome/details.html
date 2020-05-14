@@ -1,0 +1,421 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Blog</title>
+
+    <!-- meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Auto cars Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+    Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+
+    <!-- css -->
+    <link href="{% static 'welcome/css/bootstrap.css' %}" rel='stylesheet' type='text/css' />
+    <link href="{% static 'welcome/css/style.css' %}" rel='stylesheet' type='text/css' />
+    <link href="{% static 'welcome/css/blog.css' %}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+
+    <!-- Js 放头部的好处是防止Js未加载完全用户即点击，但坏处是拖慢网页加载时间；出于Js功能可能性，本人倾向放头部 -->
+    <script src="{% static 'welcome/js/jquery.min.js' %}"></script>
+    <script src="{% static 'welcome/js/bootstrap.js' %}"></script>
+    <script src="{% static 'welcome/js/responsiveslides.min.js' %}"></script>
+    <script type="text/javascript" charset="utf8" src="http://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+
+    <!-- 自定义Js -->
+    <script>
+        $(function () {
+            $("#slider3,#slider2").responsiveSlides({
+                auto: true,
+                pager: true,
+                nav: false,
+                speed: 500,
+                namespace: "callbacks",
+                before: function () {
+                    $('.events').append("<li>before event fired.</li>");
+                },
+                after: function () {
+                    $('.events').append("<li>after event fired.</li>");
+                }
+            });
+        });
+    </script>
+
+    <!--搜索框提示-->
+    <script>
+        $(document).ready(function(){
+            var highlightindex = -1;
+            $("#searchinput").on("input",function(){
+                var divs = $("#re");
+                divs.empty();
+                divs.hide();
+                if(jQuery.trim($("#searchinput").val()) != ''){
+                    var s = $("#searchinput").val();
+                    $.get('{% url 'welcome:search' %}' ,{'s':s},function(data){
+                        var obj = jQuery.parseJSON(data);
+                        divs.empty();
+                        $.each(obj,function(n, value){
+                            var newDivNode = $("<div>").attr("id", n);
+                            newDivNode.attr("class","searchhint");
+                            newDivNode.html(value);
+                            divs.append(newDivNode);
+                            newDivNode.mouseover(function () {
+                                if(highlightindex != -1){
+                                    divs.children("div").eq(highlightindex).css("background-color","transparent");
+                                }
+                                highlightindex = $(this).attr("id");
+                                $(this).css("background-color","#ebebeb");
+                            });
+                            newDivNode.mouseout(function () {
+                                $(this).css("background-color","transparent");
+                            });
+                            newDivNode.click(function () {
+                                divs.hide();
+                                var comText = $(this).text();
+                                $("#searchinput").val(comText);
+                            });
+                        });
+                    });
+                    divs.show();
+                }
+            });
+            document.onclick = function (e) {
+                var e = e ? e : windows.event;
+                var tar = e.scrElement || e.target;
+                if (tar.id != "searchinput"){
+                    if ($("#re").is(":visible")){
+                        $("#re").css("display", "none");
+                    }
+                }
+            };
+        });
+    </script>
+
+    <!--咨询-->
+    <script>
+        $(function(){
+            $('#touch').on('click', function(){
+                var email = $("#touchemail").val();
+                console.log(email);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url:'{% url 'welcome:touch' %}',
+                    data:{'email': email},
+                    dateType:"json",
+                    async: true,
+                    beforeSend:function(xhr, settings){
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function(data) {
+                        if(data.status == 'success'){
+                            alert("提交成功");
+                        //window.location.reload();//刷新当前页面.
+                        }else if(data.status == 'fail'){
+                            $('#jsCompanyTips').html(data.msg);
+                            alert("邮箱格式错误，请检查");
+                        }
+                    },
+                });
+            });
+        })
+    </script>
+
+    <!--datatable-->
+    <script>
+        $(function () {
+            $('#carinfo_table').DataTable({
+                "paging": true,       <!-- 允许分页 -->
+                "lengthChange": true, <!-- 允许改变每页显示的行数 -->
+                "searching": true,    <!-- 允许内容搜索 -->
+                "ordering": true,     <!-- 允许排序 -->
+                "info": true,         <!-- 显示信息 -->
+                "autoWidth": false,
+            });
+        });
+    </script>
+
+    <!--搜索跳转-->
+        <script>
+        function getQueryVariable(variable){
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0;i<vars.length;i++) {
+                var pair = vars[i].split("=");
+                if(pair[0] == variable)
+                    return decodeURI(pair[1]);
+            }
+            return(false);
+        }
+        $(document).ready(function(){
+            var keyword=getQueryVariable("Skey");
+            if (keyword != false) {
+                $("#searchinput").val(keyword);
+                var e = jQuery.Event("keyup");
+                $("#carinfo_table_filter label input").val(keyword);
+                e.KeyCode = 13;
+                $("#carinfo_table_filter label input").trigger(e);
+            }
+        })
+    </script>
+
+    <!--自定义css-->
+    <style type="text/css">
+        #re{
+            position: absolute;
+            top:32px;
+        }
+        .searchhint{
+            width: 204.828px;
+        }
+        .log{
+            float:right;
+        }
+    </style>
+</head>
+<body>
+<!-- banner -->
+<div class="banner banner2">
+    <div class="container">
+        <div class="log">
+            <ul class="nav navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #fff">
+                            {{ user.username }}
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% if user.type == 'customer' %}
+                                <li><a class="dropdown-item" href="{% url 'login:index' %}">个人中心</a></li>
+                            {% elif user.type == 'finance' %}
+                                <li><a class="dropdown-item" href="{% url 'Finance:index' %}">个人中心</a></li>
+                            {% elif user.type == 'HR' %}
+                                <li><a class="dropdown-item" href="{% url 'HumanResources:index' %}">个人中心</a></li>
+                            {% elif user.type == 'purchase' %}
+                                <li><a class="dropdown-item" href="{% url 'purchase:welcome' %}">个人中心</a></li>
+                            {% elif user.type == 'repair' %}
+                                <li><a class="dropdown-item" href="{% url 'repair:welcome' %}">个人中心</a></li>
+                            {% elif user.type == 'sale' %}
+                                <li><a class="dropdown-item" href="{% url 'Sale:index' %}">个人中心</a></li>
+                            {% elif user.type == 'storage' %}
+                                <li><a class="dropdown-item" href="{% url 'storage:welcome' %}">个人中心</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'welcome:logout' %}">退出登录</a></li>
+                            <li><a class="dropdown-item" href="{% url 'welcome:reset_psd_email' %}">更改密码</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'welcome:login' %}" style="color: #fff">登录</a>
+                    </li>
+                {% endif %}
+             </ul>
+        </div>
+        <div class="header">
+            <div class="logo">
+                <h1><a href="{% url 'welcome:index' %}"><img src="{% static 'welcome/images/car.png' %}" alt="log丢失"/>徳旭 <span>4S</span></a></h1>
+            </div>
+            <div class="top_details">
+                <p><span></span> (880)123 2500</p>
+                <div class="search">
+                    <form  method="get" action="{% url 'welcome:blog' %}">
+                        <input type="text" value="" placeholder="Search..." id="searchinput" name="Skey">
+                        <input type="submit" value="">
+                    </form>
+                    <div id="re"></div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <nav class="navbar navbar-default">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"> </span>
+                    <span class="icon-bar"> </span>
+                    <span class="icon-bar"> </span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse nav-wil" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="{% url 'welcome:index' %}">主页 <span class="sr-only">(current)</span></a></li>
+                    <li><a href="{% url 'welcome:about' %}">关于我们</a></li>
+                    <li><a href="{% url 'welcome:services' %}">服务介绍</a></li>
+                    <li class="active"><a href="{% url 'welcome:blog' %}">汽车信息</a></li>
+                    <li><a href="{% url 'welcome:gallery' %}">徳旭风采</a></li>
+                    <li><a href="{% url 'welcome:contact' %}">预约试驾</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<!---->
+<div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title">徳旭4S</h1>
+        <p class="lead blog-description">竭诚为您服务</p>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+            <div class="blog-post">
+                <h2 class="blog-post-title">汽车信息</h2>
+                <br>
+                <h3>型号</h3>
+                <p>{{ carinfo.ctype }}</p>
+                <br>
+                <h3>参考售价</h3>
+                <p>{{ carinfo.price }}</p>
+                <br>
+                <h3>描述</h3>
+                <p>{{ carinfo.describe }}</p>
+                <br>
+                <h3 class="blog-post-title">配图</h3>
+                <div class="col-md-6 col-md-offset-3">
+                    <img src="{{ carinfo.image.url }}" class="featurette-image img-responsive center-block">
+                </div>
+                <br>
+                <br>
+            </div>
+        </div><!-- /.blog-main -->
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+            <div class="sidebar-module sidebar-module-inset">
+                <h4>品牌</h4>
+                <p>{{ carinfo.band }}</p>
+                <h4>库存状态</h4>
+                {% if item.inventory == 0 %}
+                    <td><label class="badge badge-danger">缺货</label></td>
+                {% elif item.inventory < 10 %}
+                    <td><label class="badge badge-warning">存货紧缺</label></td>
+                {% else %}
+                    <td><label class="badge badge-success">充足</label></td>
+                {% endif %}
+            </div>
+            <div class="sidebar-module sidebar-module-inset">
+                <h4>友情链接</h4>
+                <ol class="list-unstyled">
+                    <li><a href="https://www.buaa.edu.cn" style="color: deepskyblue">北京航空航天大学</a></li>
+                    <li><a href="http://sem.buaa.edu.cn" style="color: deepskyblue;">北航经管学院</a></li>
+{#              <li><a href="https://weibo.com">新浪微博</a></li>#}
+                </ol>
+            </div>
+        </div><!-- /.blog-sidebar -->
+    </div><!-- /.row -->
+</div><!-- /.container -->
+<div class="feature_sec" style="margin-top: 30px">
+    <div class="container">
+        <div class="feature_head">
+            <h3>其他</h3>
+            <span></span>
+        </div>
+        <ul id="flexiselDemo3">
+            <li>
+                <div class="biseller-column">
+                    <a href="{% url 'welcome:details' 1 %}"><img src="{% static 'welcome/images/pic6.jpg' %}" alt=""/></a>
+                    <h4>宝来.纯电</h4>
+                    <p>德系品质 忠于严谨</p>
+                    <a class="more hvr-bounce-to-bottom" href="{% url 'welcome:blog' %}">了解更多</a>
+                </div>
+            </li>
+            <li>
+                <div class="biseller-column">
+                    <a href="{% url 'welcome:details' 2 %}"><img src="{% static 'welcome/images/pic5.jpg' %}" alt=""/></a>
+                    <h4>C-TREK蔚领</h4>
+                    <p>一见倾心的迷人</p>
+                    <a class="more hvr-bounce-to-bottom" href="{% url 'welcome:blog' %}">了解更多</a>
+                </div>
+            </li>
+            <li>
+                <div class="biseller-column">
+                    <a href="{% url 'welcome:details' 3 %}"><img src="{% static 'welcome/images/pic4.jpg' %}" alt=""/></a>
+                    <h4>探影</h4>
+                    <p>真正的安全，不止一面</p>
+                    <a class="more hvr-bounce-to-bottom" href="{% url 'welcome:blog' %}">了解更多</a>
+                </div>
+            </li>
+            <li>
+                <div class="biseller-column">
+                    <a href="{% url 'welcome:details' 4 %}"><img src="{% static 'welcome/images/pic8.jpg' %}" alt=""/></a>
+                    <h4>迈腾GTE</h4>
+                    <p>不一样，才像样</p>
+                    <a class="more hvr-bounce-to-bottom" href="{% url 'welcome:blog' %}">了解更多</a>
+                </div>
+            </li>
+        </ul>
+        <div class="clearfix"></div>
+        <script type="text/javascript">
+            $(window).load(function() {
+                $("#flexiselDemo3").flexisel({
+                    visibleItems:4,
+                    animationSpeed: 1000,
+                    autoPlay: true,
+                    autoPlaySpeed: 3000,
+                    pauseOnHover: true,
+                    enableResponsiveBreakpoints: true,
+                    responsiveBreakpoints: {
+                        portrait: {
+                            changePoint:480,
+                            visibleItems:2
+                        },
+                        landscape: {
+                            changePoint:640,
+                            visibleItems:2
+                        },
+                        tablet: {
+                            changePoint:768,
+                            visibleItems:3
+                        }
+                    }
+                });
+            });
+        </script>
+        <script type="text/javascript" src="{% static 'welcome/js/jquery.flexisel.js' %}"></script>
+    </div>
+</div>
+
+<div class="footer2">
+    <div class="container">
+        <div class="ftr2-grids">
+            <div class="col-md-4 ftr2-grid1">
+                <h3>导航</h3>
+                <ul>
+                    <li><a href="{% url 'welcome:about' %}">关于我们</a></li>
+                    <li><a href="{% url 'welcome:services' %}">服务介绍</a></li>
+                    <li><a href="{% url 'welcome:blog' %}">汽车信息</a></li>
+					<li><a href="{% url 'welcome:gallery' %}">徳旭风采</a></li>
+					<li><a href="{% url 'welcome:contact' %}">预约试驾</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 ftr2-grid2">
+                <h3>最新推文</h3>
+                <div class="ftr2-grid">
+                    <p>徳旭4S服务质量很高，令人满意</p>
+                    <a href="#">1小时前</a>
+                </div>
+                <div class="ftr2-grid">
+                    <p>等待区有奶茶零食，很棒</p>
+                    <a href="#">3小时前</a>
+                </div>
+            </div>
+            <div class="col-md-4 ftr6-grid3">
+                <h3>咨询</h3>
+                <p>输入您的邮箱，我们的客服将在第一时间联系您</p>
+                <form>
+                    <input type="text" id="touchemail" name="email" class="text" value="Enter Email" onFocus="this.value = '';" onBlur="if (this.value == '') {this.value = 'Enter Email';}">
+                    <a id="touch" href="javascript:void(0);" value="Subscribe" class="more hvr-bounce-to-bottom" style="margin-top: 0px">提交</a>
+                </form>
+                <div class="social">
+                    <ul>
+                        <li><a href="https://www.facebook.com/"><i class="facebook"></i></a></li>
+                        <li><a href="https://twitter.com/"><i class="twitter"></i></a></li>
+                        <li><a href="https://dribbble.com/"><i class="dribble"></i></a></li>
+                        <li><a href="https://www.google.com/"><i class="google"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

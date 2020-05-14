@@ -1,0 +1,87 @@
+{#{% extends "welcome/base.html" %}#}
+{#{% load static %}#}
+{#{% block title %} 注册确认 {% endblock title %}#}
+{#{% block content %}#}
+{#<h1 style="margin-left: 100px; ">{{ message }}</h1>#}
+{#    <p>还有<span id="sp">5</span>秒跳转到登陆界面</p>#}
+{#<script>#}
+{#    onload = function () {#}
+{#        setInterval(go,1000)#}
+{#    };#}
+{#    var x=4;#}
+{#    function go() {#}
+{#        if(x>=0){#}
+{#            document.getElementById("sp").innerText=x;#}
+{#        }#}
+{#        else{#}
+{#            location.href="{% url 'login' %}"#}
+{#        }#}
+{#        x--;#}
+{#    }#}
+{#</script>#}
+{#{% endblock %}#}
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登陆</title>
+{#    <link href="favicon.ico" rel="shortcut icon" />#}
+    <link href="{% static 'welcome/css/bootstrap.css' %}" rel='stylesheet' type='text/css' />
+
+    <script src="{% static 'welcome/js/jquery.min.js' %}"></script>
+    <script src="{% static 'welcome/js/bootstrap.js' %}"></script>
+
+    <style type="text/css">
+        input[name="captcha_1"]{
+{#            height:33.99px;#}
+{#            width: 468px;#}
+            width: 468px;
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+    <script>
+    onload = function () {
+        setInterval(go,1000)
+    };
+    var x=4;
+    function go() {
+        if(x>=0){
+            document.getElementById("sp").innerText=x;
+        }
+        else{
+            location.href="{% url 'welcome:login' %}"
+        }
+        x--;
+    }
+    </script>
+</head>
+<body style=" background: url(http://global.bing.com/az/hprichbg/rb/RavenWolf_EN-US4433795745_1920x1080.jpg) no-repeat center center fixed; background-size: 100%;">
+    <div class="modal-dialog" style="margin-top: 10%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center" id="myModalLabel">徳旭4S欢迎您</h4>
+                {% if message %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                </div>
+                <div class="modal-body" id = "model-body">
+                    <p>还有<span id="sp">5</span>秒跳转到登陆界面</p>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default form-control" onclick="javascript:window.location.href='{% url 'welcome:login' %}'">立刻登陆</button>
+                    </div>
+                </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+{% extends 'Sale/base.html' %}
+{% load static %}
+{% block title %}汽车信息{% endblock %}
+
+{% block script %}
+    <script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#carinfo_table').DataTable();
+
+        });
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="gallery">
+    <div class="container">
+        <div class="gallery-top gal_heading">
+            <h2>汽车信息</h2>
+
+        </div>
+        <div class="bs-docs-example">
+            <table class="table table-hover" id="carinfo_table">
+                <thead>
+                <tr>
+                    <th>品牌</th>
+                    <th>型号</th>
+                    <th>售价</th>
+                    <th>库存状态</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in carlist %}
+                    <tr onclick="location.href='{% url 'Sale:details' item.id %}';">
+                    <td>{{ item.band }}</td>
+                    <td>{{ item.ctype }}</td>
+                    <td>{{ item.price }}</td>
+                    {% if item.inventory == 0 %}
+                    <td><label class="badge badge-danger">缺货</label></td>
+                    {% elif item.inventory < 3 %}
+                    <td><label class="badge badge-warning">存货紧缺</label></td>
+                    {% else %}
+                    <td><label class="badge badge-success">充足</label></td>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <hr class="bs-docs-separator">
+    </div>
+</div>
+{% endblock %}

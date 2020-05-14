@@ -1,0 +1,76 @@
+{% extends 'HumanResources/base.html' %}
+{% load static %}
+{% block title %}
+    <p>员工排版日历表</p>
+{% endblock %}
+{% block css %}
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{% endblock %}
+{% block content %}
+    <div class="card-body">
+        <!-- Main node for this component -->
+        <div class="box-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr class="text-center">
+                    <th class="text-center">周一</th>
+                    <th class="text-center">周二</th>
+                    <th class="text-center">周三</th>
+                    <th class="text-center">周四</th>
+                    <th class="text-center">周五</th>
+                    <th class="text-center">周六</th>
+                    <th class="text-center">周日</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    {% for day_arr in arrangement.0 %}
+                        <td class="text-center">
+                            {% for w in day_arr %}
+                                {% if w.appostate == '已预约' %}
+                                    {#                                        <strong>{{ w.wid.wname }}</strong><br>#}
+                                    <label class="badge badge-danger">{{ w.wid.wname }}</label><br>
+                                {% endif %}
+                                {% if w.appostate == '空闲' %}
+                                    {#                                        {{ w.wid.wname }}<br>#}
+                                    <label class="badge badge-success">{{ w.wid.wname }}</label><br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for i in arrangement.0 %}
+                        <td class="text-center">午休</td>
+                    {% endfor %}
+
+                </tr>
+                <tr>
+                    {% for day_arr in arrangement.1 %}
+                        <td class="text-center">
+                            {% for w in day_arr %}
+                                {% if w.appostate == '已预约' %}
+                                    {#                                        <strong>{{ w.wid.wname }}</strong><br>#}
+                                    <label class="badge badge-danger">{{ w.wid.wname }}</label><br>
+                                {% endif %}
+                                {% if w.appostate == '空闲' %}
+                                    {#                                        {{ w.wid.wname }}<br>#}
+                                    <label class="badge badge-success">{{ w.wid.wname }}</label><br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+        <strong>红色表示该服务顾问已被预约</strong>
+    </div>
+    <!-- /.card-footer -->
+{% endblock %}

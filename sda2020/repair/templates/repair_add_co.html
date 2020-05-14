@@ -1,0 +1,108 @@
+{% extends 'repair.html' %}
+{% load static %}
+{% block usernow %}
+<!-- Sidebar user panel (optional) -->
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+<div class="image">
+  <img src="{% static 'adminlet/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+</div>
+<div class="info">
+  <a href="#" class="d-block">{{ w_name }}</a>
+</div>
+</div>
+{% endblock %}
+{% block mainsidebar %}
+<li class="nav-item">
+<a href="{% url 'repair:un_worksheet' %}" class="nav-link active">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    返回
+  </p>
+</a>
+</li>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card-header">
+            <h3 class="card-title">新故障零件选择</h3>
+
+            <div class="card-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">
+                </div>
+            </div>
+        </div>
+        <!-- /.card-header -->
+        <table class="table table-hover text-nowrap">
+            <thead>
+            <tr>
+                <th class="text-center">故障ID</th>
+                <th class="text-center">故障名称</th>
+                <th class="text-center">维修次数</th>
+                <th class="text-center">零件选择</th>
+                <th class="text-center">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <form action="{% url 'repair:new_fault_confirm' ws_id=work.wsid num=work.num%}" method="POST">
+                    {% csrf_token %}
+                <td class="text-center">{{ work.faultid }}</td>
+                <td class="text-center">{{ work.faultname }}</td>
+                <td class="text-center">{{ work.num }}</td>
+                <td class="form-group">
+                    {% for i in fault %}
+                    <div class="custom-control custom-checkbox">
+                          <input class="custom-control-input" type="checkbox" id="customCheckbox{{ forloop.counter0 }}" name="com" value="{{ i.faultinfoid }}">
+                          <label for="customCheckbox{{ forloop.counter0 }}" class="custom-control-label">{{ i.coname }}* {{ i.conum }}个</label>
+                        </div>
+                    {% endfor %}
+                </td>
+                <td>
+                    <div>
+                        <div style="float:right">
+                            <a href="{% url 'repair:un_worksheet' %}">
+                            <button type="button" class="btn btn-block btn-danger btn-lg">取消</button></a></div>
+                        <div style="float:right">
+                            <input type="submit" value="确定" class="btn btn-success btn-lg float-right"></div>
+                    </div>
+                </td>
+            </form>
+            </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+    <!-- /.card -->
+</div>
+{% endblock %}
+
+
+
+
+{% block script %}
+<!-- DataTables -->
+<script>
+function myFunction(a) {
+  if(a==='未领取')
+  {alert('先去领取零件才能完成维修!!!');}
+  else {alert('已完成派工单');}
+}
+</script>
+<script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'adminlet/dist/js/demo.js' %}"></script>
+<!-- page script -->
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+{% endblock %}

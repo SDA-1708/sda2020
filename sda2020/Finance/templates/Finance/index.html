@@ -1,0 +1,250 @@
+{% extends 'Finance/base.html' %}
+{% load static %}
+{% load my_filters %}
+{% block title %}财务部门{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{% endblock %}
+
+{% block usernow %}{{ workername }}{% endblock %}
+{#{% block mainsidebar %}{% endblock %}#}
+{#{% block sidebar_right %}{% endblock %}#}
+
+{% block breadcrumb %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <small id="timer"></small>
+
+            <script>
+                setInterval("timer.innerHTML=new Date().toLocaleString();");
+            </script>
+        </h1>
+    </section>
+    <div class="card card-primary card-outline">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="far fa-chart-bar"></i>
+                当月现金流
+            </h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="line-chart" style="height: 300px;"></div>
+        </div>
+        <!-- /.card-body-->
+    </div>
+    <!-- /.card -->
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="card card-primary card-tabs">
+            <div class="card-header p-0 pt-1">
+                <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="account-receivable-tab" data-toggle="pill"
+                           href="#account-receivable-content" role="tab" aria-controls="account-receivable"
+                           aria-selected="true">订单汇总</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="account-payable-tab" data-toggle="pill"
+                           href="#account-payable-content" role="tab" aria-controls="account-payable"
+                           aria-selected="false">账单汇总</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="custom-tabs-one-tabContent">
+                    <div class="tab-pane fade show active" id="account-receivable-content" role="tabpanel"
+                         aria-labelledby="account-receivable-tab">
+                        <table id="example_0" class="table table-bordered table-striped">
+                            <thead>
+                            <tr class="text-center">
+                                <th class="text-center">订单编号</th>
+                                <th class="text-center">顾客信息</th>
+                                <th class="text-center">开始时间</th>
+                                <th class="text-center">完成时间</th>
+                                <th class="text-center">总价</th>
+                                <th class="text-center">详情</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for o in orders %}
+                                <tr>
+                                    <td class="text-center">{{ o.oid }}</td>
+                                    <td class="text-center">{{ cnames|get_item:o.oid }}({{ licenses|get_item:o.oid }})</td>
+                                    <td class="text-center">{{ o.ostime }}</td>
+                                    <td class="text-center">
+                                        {% if o.oftime != Null %}
+                                            {{ o.oftime }}
+                                        {% endif %}
+                                        {% if o.oftime == Null %}
+                                            订单未完成
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">{{ o.sumprice }}</td>
+                                    <td align="center">
+                                        <button type="button" class="btn btn-tool">
+                                            <a class="nav-link" href="{% url 'Sale:orderDetails' o.oid %}"><i
+                                                    class="fas fa-outdent"></i></a>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="account-payable-content" role="tabpanel"
+                         aria-labelledby="account-payable-tab">
+                        <table id="example_1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr class="text-center">
+                                <th class="text-center">采购单编号</th>
+{#                                <th class="text-center">商品信息</th>#}
+                                <th class="text-center">采购时间</th>
+                                <th class="text-center">金额</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for p in purchase %}
+                                <tr>
+                                    <td class="text-center">{{ p.purchaseid }}</td>
+{#                                    <td class="text-center">{{ cnames|get_item:o.oid }}({{ licenses|get_item:o.oid }})</td>#}
+                                    <td class="text-center">{{ p.ptime }}</td>
+                                    <td class="text-center">{{ p.psumprice }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+    <!-- FLOT CHARTS -->
+    <script src="{% static 'adminlet/plugins/flot/jquery.flot.js' %}"></script>
+    <!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
+    <script src="{% static 'adminlet/plugins/flot-old/jquery.flot.resize.min.js' %}"></script>
+    <!-- FLOT PIE PLUGIN - also used to draw donut charts -->
+    <script src="{% static 'adminlet/plugins/flot-old/jquery.flot.pie.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#example_0').DataTable();
+            $('#example_1').DataTable();
+
+        });
+    </script>
+    <style type="text/css">
+        .fa-edit {
+            color: darkblue;
+            font-size: 15px;
+        }
+    </style>
+    <script>
+        $(function () {
+            /*
+     * LINE CHART
+     * ----------
+     */
+            //LINE randomly generated data
+            var listx = '{{ sin }}'.split(',');
+            var listy = '{{ cos }}'.split(',');
+            {#var dates = '{{ date }}'.split(',');#}
+            var sin = [],
+                cos = [];
+            for (var i = 0; i < 30; i += 1) {
+                {#alert(listx[i]);#}
+                {#sin.push([dates[i], listx[i]]);#}
+                {#cos.push([dates[i], listy[i]]);#}
+                sin.push([i, listx[i]]);
+                cos.push([i, listy[i]]);
+            }
+
+            var line_data1 = {
+                data: sin,
+                color: '#3c8dbc',
+                label:'income'
+            }
+            var line_data2 = {
+                data: cos,
+                color: '#00c0ef',
+                label:'outcome'
+            }
+            $.plot('#line-chart', [line_data1, line_data2], {
+                grid: {
+                    hoverable: true,
+                    borderColor: '#f3f3f3',
+                    borderWidth: 1,
+                    tickColor: '#f3f3f3'
+                },
+                series: {
+                    shadowSize: 0,
+                    lines: {
+                        show: true
+                    },
+                    points: {
+                        show: true
+                    },
+                },
+                lines: {
+                    fill: false,
+                    color: ['#3c8dbc', '#f56954']
+                },
+                yaxis: {
+                    show: true,
+                    title: 'Money',
+                    legend: 'Money'
+                },
+                xaxis: {
+                    show: true,
+                    title: 'Date'
+                }
+            });
+            //Initialize tooltip on hover
+            $('<div class="tooltip-inner" id="line-chart-tooltip"></div>').css({
+                position: 'absolute',
+                display: 'none',
+                opacity: 0.8
+            }).appendTo('body');
+            $('#line-chart').bind('plothover', function (event, pos, item) {
+
+                if (item) {
+                    var x = item.datapoint[0].toFixed(2),
+                        y = item.datapoint[1].toFixed(2);
+
+                    $('#line-chart-tooltip').html(item.series.label + ' at ' + x + ' = ' + y)
+                        .css({
+                            top: item.pageY + 5,
+                            left: item.pageX + 5
+                        })
+                        .fadeIn(200)
+                } else {
+                    $('#line-chart-tooltip').hide()
+                }
+
+            })
+            /* END LINE CHART */
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'Sale/base.html' %}
+{% load static %}
+{% load my_filters %}
+{% block title %}顾客订单{% endblock %}
+
+{% block script %}
+    <script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#example_0').DataTable({"paging": false});
+
+        });
+    </script>
+    <style type="text/css">
+        .fa-edit {
+            color: darkblue;
+            font-size: 15px;
+        }
+    </style>
+    <script>
+        function checkInput() {
+            window.location.reload();
+        }
+    </script>
+    <script>
+        function checkEdit(oid_curr) {
+            {#alert(1);#}
+            oid =oid_curr;
+            {#alert(oid);#}
+            let obj = document.querySelector("#return_"+oid);
+            {#alert(obj);#}
+            var message = obj.value;
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: '{% url 'Sale:order' %}',
+                data: {'message': message, 'oid': oid},
+                dateType: "json",
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.status == 'success') {
+                        alert("输入成功");
+                        window.location.reload();//刷新当前页面.
+                    } else if (data.status == 'fail') {
+                        {#$('#jsCompanyTips').html(data.msg);#}
+                        alert("输入为空，填写失败");
+                    }
+                },
+            });
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <!-- /.card -->
+    <div class="card card-info">
+        <div class="card-header">
+            <h3 class="card-title">顾客订单 | By {{ wid }}</h3>
+
+            <div class="card-tools">
+                <!-- This will cause the card to maximize when clicked -->
+                <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i>
+                </button>
+                <!-- This will cause the card to collapse when clicked -->
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                </button>
+            </div>
+            <!-- /.card-tools -->
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example_0" class="table table-bordered table-striped">
+                        <thead>
+                        <tr class="text-center">
+                            <th class="text-center">订单编号</th>
+                            <th class="text-center">顾客信息</th>
+                            {#                            <th class="text-center">汽车信息</th>#}
+                            <th class="text-center">总价</th>
+                            <th class="text-center">开始时间</th>
+                            <th class="text-center">完成时间</th>
+                            <th class="text-center">回访意见</th>
+                            <th class="text-center">详情</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for o in orders %}
+                            <tr>
+                                <td class="text-center">{{ o.oid }}</td>
+                                <td class="text-center">{{ cnames|get_item:o.oid }}({{ licenses|get_item:o.oid }})</td>
+                                <td class="text-center">{{ o.sumprice }}</td>
+                                <td class="text-center">{{ o.ostime }}</td>
+                                <td class="text-center">
+                                    {% if o.oftime != Null %}
+                                        {{ o.oftime }}
+                                    {% endif %}
+                                    {% if o.oftime == Null %}
+                                        订单未完成
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if o.return_info != Null %}
+                                        {{ o.return_info }}
+                                    {% endif %}
+                                    {% if o.return_info == Null %}
+                                        <button type="button" class="btn btn-tool" data-toggle="modal"
+                                                data-target="#modal-info">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <div class="modal fade" id="modal-info">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content bg-info">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title">填写回访信息</h4>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    {#                                                    <form action="{% url "Sale:order" %}" method="post">#}
+                                                    {#                                                        {% csrf_token %}#}
+                                                    <div class="modal-body">
+                                                        <div>
+                                                            <label for="return_{{ o.oid }}" style="float: left">
+                                                            </label>
+                                                            <textarea id="return_{{ o.oid }}" name="return-info" class="form-control"
+                                                            ></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-between">
+                                                        <button type="button" class="btn btn-outline-light"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-light"
+                                                                onclick="checkEdit('{{ o.oid }}');">提交
+                                                        </button>
+                                                        {#                                                            <input type="submit" value="提交"#}
+                                                        {#                                                                   class="btn btn-outline-light">#}
+                                                    </div>
+                                                    {#                                                    </form>#}
+                                                </div>
+                                                <!-- /.modal-content -->
+                                            </div>
+                                            <!-- /.modal-dialog -->
+                                        </div>
+                                        <!-- /.modal -->
+                                    {% endif %}
+                                </td>
+                                <td align="center">
+                                    <button type="button" class="btn btn-tool" onclick="checkInput();">
+                                        <a class="nav-link" href="{% url 'Sale:orderDetails' o.oid %}"><i
+                                                class="fas fa-outdent"></i></a>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                        </tfoot>
+
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+{% endblock %}
+
+

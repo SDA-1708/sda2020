@@ -1,0 +1,88 @@
+{% extends 'login/base.html' %}
+{% load static %}
+{% block title %}个人中心{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{% endblock %}
+
+{#{% block usernow %}{% endblock %}#}
+{#{% block mainsidebar %}{% endblock %}#}
+{#{% block sidebar_right %}{% endblock %}#}
+
+{% block breadcrumb %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            个人中心
+        </h1>
+        <br>
+        <div class="card card-warning">
+            <div class="col-sm-4 invoice-col">
+                顾客信息 &emsp;{{ cus.cusno }}
+                <address>
+                    <strong style="font-size: 30px;">{{ cus.cname }}</strong> &emsp;{{ cus.cgender }}<br>
+                    <strong>电话:</strong> {{ cus.tel }}<br>
+                    <strong>邮箱:</strong> {{ cus.email }}<br>
+                    <strong>地址:</strong> {{ cus.caddress }}<br>
+                </address>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.card -->
+    </section>
+{% endblock %}
+
+{% block content %}
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h2>历史订单</h2>
+                    <p>Customer Orders</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-wrench"></i>
+                </div>
+                <a href="{% url 'personalCenter:order' %}" class="small-box-footer">Go <i
+                        class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h2>车辆信息</h2>
+                    <p>Cars Information</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-model-s"></i>
+                </div>
+                <a href="{% url 'personalCenter:carInfo' %}" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+{#        <!-- ./col -->#}
+{#        <div class="col-lg-3 col-6">#}
+{#            <!-- small box -->#}
+{#            <div class="small-box bg-danger">#}
+{#                <div class="inner">#}
+{#                    <h2>服务预约</h2>#}
+{##}
+{#                    <p>Fault Repairing</p>#}
+{#                </div>#}
+{#                <div class="icon">#}
+{#                    <i class="ion ion-wrench"></i>#}
+{#                </div>#}
+{#                <a href="{% url 'welcome:contact' %}" class="small-box-footer">Go <i#}
+{#                        class="fas fa-arrow-circle-right"></i></a>#}
+{#            </div>#}
+{#        </div>#}
+{#        <!-- ./col -->#}
+    </div>
+    <!-- /.row -->
+{% endblock %}
+
+{% block script %}
+{% endblock %}

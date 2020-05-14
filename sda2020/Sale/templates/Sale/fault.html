@@ -1,0 +1,104 @@
+{% extends 'Sale/base.html' %}
+{% load static %}
+{% block title %}维修保养{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet"
+          href="{% static 'adminlet/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="{% static 'adminlet/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+
+{% endblock %}
+{% block breadcrumb %}
+{% endblock %}
+{% block content %}
+    <!-- /.card -->
+    <div class="card card-info">
+        <div class="card-header">
+            <h3 class="card-title">故障列表</h3>
+
+            <div class="card-tools">
+                <!-- This will cause the card to maximize when clicked -->
+                <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i>
+                </button>
+                <!-- This will cause the card to collapse when clicked -->
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                </button>
+            </div>
+            <!-- /.card-tools -->
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <form action="{% url "Sale:repairList" %}" method="post">
+                        {% csrf_token %}
+                        <table id="example_0" class="table table-bordered table-striped">
+                            <thead>
+                            <tr class="text-center">
+                                <th class="text-center">故障编号</th>
+                                <th class="text-center">故障名称</th>
+                                <th class="text-center">预估工时</th>
+                                <th class="text-center">重复次数</th>
+                                <th class="text-center">需要</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for f in faults %}
+                                <tr>
+                                    <td class="text-center">{{ f.faultid }}</td>
+                                    <td class="text-center">{{ f.faultname }}</td>
+                                    <td class="text-center">{{ f.eload }}</td>
+                                    <td align="center">
+                                        <div class="form-group col-sm-5">
+                                            <label for="repeat_{{ f.faultid }}" style="float:left"></label>
+                                            <select id="repeat_{{ f.faultid }}" name="repeat_{{ f.faultid }}">
+                                                <option selected="selected">1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td class="form-group clearfix" align="center">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" name="checkboxPrimary_{{ f.faultid }}"
+                                                   id="checkboxPrimary_{{ f.faultid }}">
+                                            <label for="checkboxPrimary_{{ f.faultid }}">
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+
+                        </table>
+                        <div class="card-footer">
+                            <input type="submit" value="提交" class="btn btn-success">
+                        </div>
+                    </form>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#example_0').DataTable({"paging": false});
+
+        });
+    </script>
+{% endblock %}

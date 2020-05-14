@@ -1,0 +1,214 @@
+{% extends 'login/base.html' %}
+{% load my_filters %}
+{% load static %}
+{% block title %}顾客订单 | {{ oid }}{% endblock %}
+{% block css %}
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{% endblock %}
+{% block script %}
+    <script>
+        function checkInput() {
+            var name = document.getElementById("inputName").value;
+            if (name == "") {
+                alert("姓名不能为空");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
+    <script language=javascript>
+    function doPrint() {
+        bdhtml=window.document.body.innerHTML;
+        sprnstr="<!--startprint-->";
+        eprnstr="<!--endprint-->";
+        prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);
+        prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr));
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+    }
+
+</script>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="callout callout-info">
+                    <h5><i class="fas fa-shopping-bag"></i> 顾客订单</h5>
+                    单击底部的按钮可以打印或导出
+                </div>
+
+                <!--startprint-->
+                <!-- Main content -->
+                <div class="invoice p-3 mb-3">
+                    <!-- title row -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>
+                                <i class="fas fa-globe"></i> 维修订单
+                                <small id="timer" class="float-right"></small>
+                                <script>
+                                    setInterval("timer.innerHTML=new Date().toLocaleDateString();");
+                                </script>
+                                <small class="float-right">日期 :</small>
+                            </h4>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- info row -->
+                    <div class="row invoice-info">
+                        <div class="col-sm-4 invoice-col">
+                            顾客信息 &emsp;{{ cus.cusno }}
+                            <address>
+                                <strong style="font-size: 30px;">{{ cus.cname }}</strong> &emsp;{{ cus.cgender }}<br>
+                                <strong>电话:</strong> {{ cus.tel }}<br>
+                                <strong>邮箱:</strong> {{ cus.email }}<br>
+                                <strong>地址:</strong>{{ cus.caddress }}<br>
+                            </address>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+                            <br>
+                            <br>
+                            汽车信息 &emsp;{{ car.cid.cid }}
+                            <address>
+                                <strong>品牌:</strong> {{ car.cid.id.band }}<br>
+                                <strong>车型:</strong> {{ car.cid.id.ctype }}<br>
+                                <strong>车牌号:</strong>{{ car.license }}<br>
+                            </address>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+
+                    <!-- Table row -->
+                    <div class="row">
+                        <div class="col-12 table-responsive">
+                            <br>
+                            <h4>维修服务项目</h4>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>项目编号</th>
+                                    <th>项目名称</th>
+                                    <th>重复次数</th>
+                                    <th>项目总工时</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for f,rl in faultlist.items %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ f }}</td>
+                                        <td>{{ rl.0.faultname }}</td>
+                                        <td>{{ rl.1}}</td>
+                                        <td>{{ rl.1|multiply:rl.0.eload }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><strong>小计</strong></td>
+                                    <td><strong>{{ subtotal.0 }}</strong></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-12 table-responsive">
+                            <br>
+                            <h4>零件使用详情</h4>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>服务编号</th>
+                                    <th>零件名称</th>
+                                    <th>使用数量</th>
+                                    <th>零件单价</th>
+                                    <th>零件总价</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for f in repairlist %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ f.faultinfoid }}</td>
+                                        <td>{{ f.coid.coname }}</td>
+                                        <td>{{ repeat|get_item:f.faultinfoid}}</td>
+                                        <td>{{ f.coid.coprice }}</td>
+                                        <td>{% widthratio f.coid.coprice 1.0 repeat|get_item:f.faultinfoid %}</td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><strong>小计</strong></td>
+                                    <td><strong>{{ subtotal.1 }}</strong></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+
+                    <div class="row">
+                        <!-- /.col -->
+                        <div class="col-6">
+                            <p class="lead">应付账款 </p>
+
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th style="width:50%">工时费(125元/小时）:</th>
+                                        <td>{{ subtotal.0|multiply:125 }}元</td>
+                                    </tr>
+                                    <tr>
+                                        <th>零件费:</th>
+                                        <td>{{ subtotal.1 }}元</td>
+                                    </tr>
+                                    <tr>
+                                        <th>税额（9.3%）</th>
+                                        <td>{{ tax }}元</td>
+                                    </tr>
+                                    <tr>
+                                        <th>总共:</th>
+                                        <td>{{ sumall }}元</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <!--endprint-->
+                    <!-- this row will not appear when printing -->
+                    <div class="row no-print">
+                        <div class="col-12" align="right">
+                            <a href="#" target="_blank" class="btn btn-default" onClick="doPrint()"><i
+                                    class="fas fa-print"></i> 打印</a>
+                            <a href="{% url "personalCenter:index" %}" class="btn btn-secondary">返回</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.invoice -->
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+{% endblock %}

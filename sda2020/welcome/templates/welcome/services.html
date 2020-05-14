@@ -1,0 +1,376 @@
+{%  load static %}
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>About</title>
+
+    <!-- meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Auto cars Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+    Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+
+    <!-- css -->
+    <link href="{% static 'welcome/css/bootstrap.css' %}" rel='stylesheet' type='text/css' />
+    <link href="{% static 'welcome/css/style.css' %}" rel='stylesheet' type='text/css' />
+
+    <!-- Js 放头部的好处是防止Js未加载完全用户即点击，但坏处是拖慢网页加载时间；出于Js功能可能性，本人倾向放头部 -->
+    <script src="{% static 'welcome/js/jquery.min.js' %}"></script>
+    <script src="{% static 'welcome/js/bootstrap.js' %}"></script>
+    <script src="{% static 'welcome/js/responsiveslides.min.js' %}"></script>
+
+    <!-- 自定义Js -->
+    <script>
+        $(function () {
+            $("#slider3,#slider2").responsiveSlides({
+                auto: true,
+                pager: true,
+                nav: false,
+                speed: 500,
+                namespace: "callbacks",
+                before: function () {
+                    $('.events').append("<li>before event fired.</li>");
+                },
+                after: function () {
+                    $('.events').append("<li>after event fired.</li>");
+                }
+            });
+        });
+    </script>
+
+    <!--搜索框提示-->
+    <script>
+        $(document).ready(function(){
+            var highlightindex = -1;
+            $("#searchinput").on("input",function(){
+                var divs = $("#re");
+                divs.empty();
+                divs.hide();
+                if(jQuery.trim($("#searchinput").val()) != ''){
+                    var s = $("#searchinput").val();
+                    $.get('{% url 'welcome:search' %}' ,{'s':s},function(data){
+                        var obj = jQuery.parseJSON(data);
+                        divs.empty();
+                        $.each(obj,function(n, value){
+                            var newDivNode = $("<div>").attr("id", n);
+                            newDivNode.attr("class","searchhint");
+                            newDivNode.html(value);
+                            divs.append(newDivNode);
+                            newDivNode.mouseover(function () {
+                                if(highlightindex != -1){
+                                    divs.children("div").eq(highlightindex).css("background-color","transparent");
+                                }
+                                highlightindex = $(this).attr("id");
+                                $(this).css("background-color","#ebebeb");
+                            });
+                            newDivNode.mouseout(function () {
+                                $(this).css("background-color","transparent");
+                            });
+                            newDivNode.click(function () {
+                                divs.hide();
+                                var comText = $(this).text();
+                                $("#searchinput").val(comText);
+                            });
+                        });
+                    });
+                    divs.show();
+                }
+            });
+            document.onclick = function (e) {
+                var e = e ? e : windows.event;
+                var tar = e.scrElement || e.target;
+                if (tar.id != "searchinput"){
+                    if ($("#re").is(":visible")){
+                        $("#re").css("display", "none");
+                    }
+                }
+            };
+        });
+    </script>
+    <!--咨询-->
+    <script>
+        $(function(){
+            $('#touch').on('click', function(){
+                var email = $("#touchemail").val();
+                console.log(email);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url:'{% url 'welcome:touch' %}',
+                    data:{'email': email},
+                    dateType:"json",
+                    async: true,
+                    beforeSend:function(xhr, settings){
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function(data) {
+                        if(data.status == 'success'){
+                            alert("提交成功");
+                        //window.location.reload();//刷新当前页面.
+                        }else if(data.status == 'fail'){
+                            $('#jsCompanyTips').html(data.msg);
+                            alert("邮箱格式错误，请检查");
+                        }
+                    },
+                });
+            });
+        })
+    </script>
+    <!--咨询-->
+    <script>
+        $(function () {
+            $("#contact_submit").on('click',function () {
+                var name = $('#contact_name').val();
+                var email = $('#contact_email').val();
+                var phone = $('#contact_phone').val();
+                var gender = $('#contact_gender').val();
+                var choice = $('input[name="choice"]:checked').val();
+                if(typeof(choice) == "undefined"){
+                    choice = 'null';
+                }
+{#                alert(choice);#}
+                var content = $('#contact_content').val();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url:'{% url 'welcome:appo' %}',
+                    data:{'name':name,'email': email,'phone':phone,'gender':gender,'choice':choice,"content":content},
+                    dateType:"json",
+                    async: true,
+                    beforeSend:function(xhr, settings){
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function(data) {
+                        if(data.status == 'success'){
+                            alert("预约成功");
+                            window.location.reload();//刷新当前页面.
+                        }else if(data.status == 'fail'){
+                            $('#jsCompanyTips').html(data.msg);
+                            alert(data.msg);
+                        }
+                    },
+                });
+            })
+        })
+    </script>
+
+    <!--自定义css-->
+    <style type="text/css">
+        #re{
+            position: absolute;
+            top:32px;
+        }
+        .searchhint{
+            width: 204.828px;
+        }
+        .log{
+            float:right;
+        }
+    </style>
+
+</head>
+<body>
+<!-- banner -->
+<div class="banner banner2">
+    <div class="container">
+        <div class="log">
+            <ul class="nav navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #fff">
+                            {{ user.username }}
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% if user.type == 'customer' %}
+                                <li><a class="dropdown-item" href="{% url 'login:index' %}">个人中心</a></li>
+                            {% elif user.type == 'finance' %}
+                                <li><a class="dropdown-item" href="{% url 'Finance:index' %}">个人中心</a></li>
+                            {% elif user.type == 'HR' %}
+                                <li><a class="dropdown-item" href="{% url 'HumanResources:index' %}">个人中心</a></li>
+                            {% elif user.type == 'purchase' %}
+                                <li><a class="dropdown-item" href="{% url 'purchase:welcome' %}">个人中心</a></li>
+                            {% elif user.type == 'repair' %}
+                                <li><a class="dropdown-item" href="{% url 'repair:welcome' %}">个人中心</a></li>
+                            {% elif user.type == 'sale' %}
+                                <li><a class="dropdown-item" href="{% url 'Sale:index' %}">个人中心</a></li>
+                            {% elif user.type == 'storage' %}
+                                <li><a class="dropdown-item" href="{% url 'storage:welcome' %}">个人中心</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'welcome:logout' %}">退出登录</a></li>
+                            <li><a class="dropdown-item" href="{% url 'welcome:reset_psd_email' %}">更改密码</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'welcome:login' %}" style="color: #fff">登录</a>
+                    </li>
+                {% endif %}
+             </ul>
+        </div>
+        <div class="header">
+            <div class="logo">
+                <h1><a href="{% url 'welcome:index' %}"><img src="{% static 'welcome/images/car.png' %}" alt="log丢失"/>徳旭 <span>4S</span></a></h1>
+            </div>
+            <div class="top_details">
+                <p><span></span> (880)123 2500</p>
+                <div class="search">
+                    <form  method="get" action="{% url 'welcome:blog' %}">
+                        <input type="text" value="" placeholder="Search..." id="searchinput" name="Skey">
+                        <input type="submit" value="">
+                    </form>
+                    <div id="re"></div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <nav class="navbar navbar-default">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"> </span>
+                    <span class="icon-bar"> </span>
+                    <span class="icon-bar"> </span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse nav-wil" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="{% url 'welcome:index' %}">主页 <span class="sr-only">(current)</span></a></li>
+                    <li><a href="{% url 'welcome:about' %}">关于我们</a></li>
+                    <li class="active"><a href="{% url 'welcome:services' %}">服务介绍</a></li>
+                    <li><a href="{% url 'welcome:blog' %}">汽车信息</a></li>
+                    <li><a href="{% url 'welcome:gallery' %}">徳旭风采</a></li>
+                    <li><a href="{% url 'welcome:contact' %}">预约试驾</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<!---->
+<div class="services">
+    <div class="container">
+        <h2>Services</h2>
+        <ol class="breadcrumb">
+            <li><a href="index.html">首页</a></li>
+            <li class="active">服务</li>
+        </ol>
+        <div class="section group sec_group">
+            <div class="col-md-6 service_sec">
+                <div class="listimg listimg_2_of_1">
+                    <img src="{% static 'welcome/images/service-6.png' %}" alt="" />
+                </div>
+                <div class="text list_2_of_1">
+                    <h3>到店服务</h3>
+                    <p>徳旭4S门店位于北京海淀区学院路37号，店内除提供下述的各类服务外，还提供了专门的休息区。休息区内有各种零食、空调、WiFi以便使客人在等待时休憩。</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="col-md-6 service_sec ">
+                <div class="listimg listimg_2_of_1">
+                    <img src="{% static 'welcome/images/service-2.png' %}" alt="" />
+                </div>
+                <div class="text list_2_of_1">
+                    <h3>维修服务</h3>
+                    <p>徳旭4S以质量为本，坚持使用原厂零件，保证您的驾驶感觉一如既往。此外徳旭4S还提供了多种优惠方案，适用于不同的车型与零件，给顾客以多样的选择。</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="section group sec_group">
+            <div class="col-md-6 service_sec">
+                <div class="listimg listimg_2_of_1">
+                    <img src="{% static 'welcome/images/service-3.png' %}" alt="" />
+                </div>
+                <div class="text list_2_of_1">
+                    <h3>保养服务</h3>
+                    <p>在日常的保养中，我们将一如既往的认真负责。对每一笔保养订单我们都将回访，一旦顾客出现不适感，将免费进行二次保养</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="col-md-6 service_sec">
+                <div class="listimg listimg_2_of_1">
+                    <img src="{% static 'welcome/images/service-4.png' %}" alt="" />
+                </div>
+                <div class="text list_2_of_1">
+                    <h3>金融服务</h3>
+                    <p>徳旭4S提供了多种多样的金融保险服务，使顾客可实现小投入大避险，为顾客的前进保驾护航。</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="section group sec_group">
+            <div class="col-md-6 service_sec">
+                <div class="listimg listimg_2_of_1">
+                    <img src="{% static 'welcome/images/service-5.png' %}" alt="" />
+                </div>
+                <div class="text list_2_of_1">
+                    <h3>售车服务</h3>
+                    <p>徳旭4S的<a style="font-size: 0.77em;line-height: 1.7em;color: lightskyblue;margin: 0;display: inline;box-sizing: border-box;padding: 0;background: none" href="{% url 'welcome:blog' %}">车辆</a> 以质量第一，每一辆车在被提车之前都需要经过复杂的检查。此外，徳旭4S还提供优惠的二手车以供客户选择</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="col-md-6 service_sec">
+                <div class="listimg listimg_2_of_1">
+                    <img src="{% static 'welcome/images/service-1.png' %}" alt="" />
+                </div>
+                <div class="text list_2_of_1">
+                    <h3>试架服务</h3>
+                    <p>当顾客难以选择或不放心时，顾客可<a style="font-size: 0.77em;line-height: 1.7em;color: lightskyblue;margin: 0;display: inline;box-sizing: border-box;padding: 0;background: none" href="{% url 'welcome:contact' %}">预约</a>试驾，有多种时间段供顾客进行选择，顾客也可挑选放心的服务顾问来帮助您。</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<!---->
+<div class="footer2">	
+    <div class="container">
+        <div class="ftr2-grids">
+            <div class="col-md-4 ftr2-grid1">
+                <h3>导航</h3>
+                <ul>
+                    <li><a href="{% url 'welcome:about' %}">关于我们</a></li>
+                    <li><a href="{% url 'welcome:services' %}">服务介绍</a></li>
+                    <li><a href="{% url 'welcome:blog' %}">汽车信息</a></li>
+					<li><a href="{% url 'welcome:gallery' %}">徳旭风采</a></li>
+					<li><a href="{% url 'welcome:contact' %}">预约试驾</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 ftr2-grid2">
+                <h3>最新推文</h3>
+                <div class="ftr2-grid">
+                    <p>徳旭4S服务质量很高，令人满意</p>
+                    <a href="#">1小时前</a>
+                </div>
+                <div class="ftr2-grid">
+                    <p>等待区有奶茶零食，很棒</p>
+                    <a href="#">3小时前</a>
+                </div>
+            </div>
+            <div class="col-md-4 ftr6-grid3">
+                <h3>咨询</h3>
+                <p>输入您的邮箱，我们的客服将在第一时间联系您</p>
+                <form>
+                    <input type="text" id="touchemail" name="email" class="text" value="Enter Email" onFocus="this.value = '';" onBlur="if (this.value == '') {this.value = 'Enter Email';}">
+                    <a id="touch" href="javascript:void(0);" value="Subscribe" class="more hvr-bounce-to-bottom" style="margin-top: 0px">提交</a>
+                </form>
+                <div class="social">
+                    <ul>
+                        <li><a href="https://www.facebook.com/"><i class="facebook"></i></a></li>
+                        <li><a href="https://twitter.com/"><i class="twitter"></i></a></li>
+                        <li><a href="https://dribbble.com/"><i class="dribble"></i></a></li>
+                        <li><a href="https://www.google.com/"><i class="google"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<!---->
+
+</body>
+</html>

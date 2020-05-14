@@ -1,0 +1,411 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>About</title>
+
+    <!-- meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Auto cars Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+    Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+
+    <!-- css -->
+    <link href="{% static 'welcome/css/bootstrap.css' %}" rel='stylesheet' type='text/css' />
+    <link href="{% static 'welcome/css/style.css' %}" rel='stylesheet' type='text/css' />
+
+    <!-- Js 放头部的好处是防止Js未加载完全用户即点击，但坏处是拖慢网页加载时间；出于Js功能可能性，本人倾向放头部 -->
+    <script src="{% static 'welcome/js/jquery.min.js' %}"></script>
+    <script src="{% static 'welcome/js/bootstrap.js' %}"></script>
+    <script src="{% static 'welcome/js/responsiveslides.min.js' %}"></script>
+
+    <!-- 自定义Js -->
+    <script>
+        $(function () {
+            $("#slider3,#slider2").responsiveSlides({
+                auto: true,
+                pager: true,
+                nav: false,
+                speed: 500,
+                namespace: "callbacks",
+                before: function () {
+                    $('.events').append("<li>before event fired.</li>");
+                },
+                after: function () {
+                    $('.events').append("<li>after event fired.</li>");
+                }
+            });
+        });
+    </script>
+
+    <!--搜索框提示-->
+    <script>
+        $(document).ready(function(){
+            var highlightindex = -1;
+            $("#searchinput").on("input",function(){
+                var divs = $("#re");
+                divs.empty();
+                divs.hide();
+                if(jQuery.trim($("#searchinput").val()) != ''){
+                    var s = $("#searchinput").val();
+                    $.get('{% url 'welcome:search' %}' ,{'s':s},function(data){
+                        var obj = jQuery.parseJSON(data);
+                        divs.empty();
+                        $.each(obj,function(n, value){
+                            var newDivNode = $("<div>").attr("id", n);
+                            newDivNode.attr("class","searchhint");
+                            newDivNode.html(value);
+                            divs.append(newDivNode);
+                            newDivNode.mouseover(function () {
+                                if(highlightindex != -1){
+                                    divs.children("div").eq(highlightindex).css("background-color","transparent");
+                                }
+                                highlightindex = $(this).attr("id");
+                                $(this).css("background-color","#ebebeb");
+                            });
+                            newDivNode.mouseout(function () {
+                                $(this).css("background-color","transparent");
+                            });
+                            newDivNode.click(function () {
+                                divs.hide();
+                                var comText = $(this).text();
+                                $("#searchinput").val(comText);
+                            });
+                        });
+                    });
+                    divs.show();
+                }
+            });
+            document.onclick = function (e) {
+                var e = e ? e : windows.event;
+                var tar = e.scrElement || e.target;
+                if (tar.id != "searchinput"){
+                    if ($("#re").is(":visible")){
+                        $("#re").css("display", "none");
+                    }
+                }
+            };
+        });
+    </script>
+    <!--咨询-->
+    <script>
+        $(function(){
+            $('#touch').on('click', function(){
+                var email = $("#touchemail").val();
+                console.log(email);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url:'{% url 'welcome:touch' %}',
+                    data:{'email': email},
+                    dateType:"json",
+                    async: true,
+                    beforeSend:function(xhr, settings){
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function(data) {
+                        if(data.status == 'success'){
+                            alert("提交成功");
+                        //window.location.reload();//刷新当前页面.
+                        }else if(data.status == 'fail'){
+                            $('#jsCompanyTips').html(data.msg);
+                            alert("邮箱格式错误，请检查");
+                        }
+                    },
+                });
+            });
+        })
+    </script>
+    <!--预约-->
+    <script>
+        $(function () {
+            $("#contact_submit").on('click',function () {
+                var name = $('#contact_name').val();
+                var email = $('#contact_email').val();
+                var phone = $('#contact_phone').val();
+                var gender = $('#contact_gender').val();
+                var choice = $('input[name="choice"]:checked').val();
+                if(typeof(choice) == "undefined"){
+                    choice = 'null';
+                }
+{#                alert(choice);#}
+                var content = $('#contact_content').val();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url:'{% url 'welcome:appo' %}',
+                    data:{'name':name,'email': email,'phone':phone,'gender':gender,'choice':choice,"content":content},
+                    dateType:"json",
+                    async: true,
+                    beforeSend:function(xhr, settings){
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function(data) {
+                        if(data.status == 'success'){
+                            alert("预约成功");
+                            window.location.reload();//刷新当前页面.
+                        }else if(data.status == 'fail'){
+                            $('#jsCompanyTips').html(data.msg);
+                            alert(data.msg);
+                        }
+                    },
+                });
+            })
+        })
+    </script>
+
+    <!--自定义css-->
+    <style type="text/css">
+        #re{
+            position: absolute;
+            top:32px;
+        }
+        .searchhint{
+            width: 204.828px;
+        }
+        .log{
+            float:right;
+        }
+    </style>
+
+</head>
+<body>
+<!-- banner -->
+<div class="banner banner2">
+    <div class="container">
+        <div class="log">
+            <ul class="nav navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #fff">
+                            {{ user.username }}
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% if user.type == 'customer' %}
+                                <li><a class="dropdown-item" href="{% url 'login:index' %}">个人中心</a></li>
+                             {% elif user.type == 'finance' %}
+                                 <li><a class="dropdown-item" href="{% url 'Finance:index' %}">个人中心</a></li>
+                             {% elif user.type == 'HR' %}
+                                 <li><a class="dropdown-item" href="{% url 'HumanResources:index' %}">个人中心</a></li>
+                             {% elif user.type == 'purchase' %}
+                                 <li><a class="dropdown-item" href="{% url 'purchase:welcome' %}">个人中心</a></li>
+                             {% elif user.type == 'repair' %}
+                                 <li><a class="dropdown-item" href="{% url 'repair:welcome' %}">个人中心</a></li>
+                             {% elif user.type == 'sale' %}
+                                 <li><a class="dropdown-item" href="{% url 'Sale:index' %}">个人中心</a></li>
+                             {% elif user.type == 'storage' %}
+                                 <li><a class="dropdown-item" href="{% url 'storage:welcome' %}">个人中心</a></li>
+                             {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'welcome:logout' %}">退出登录</a></li>
+                            <li><a class="dropdown-item" href="{% url 'welcome:reset_psd_email' %}">更改密码</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'welcome:login' %}" style="color: #fff">登录</a>
+                    </li>
+                {% endif %}
+             </ul>
+        </div>
+        <div class="header">
+            <div class="logo">
+                <h1><a href="{% url 'welcome:index' %}"><img src="{% static 'welcome/images/car.png' %}" alt="log丢失"/>徳旭 <span>4S</span></a></h1>
+            </div>
+            <div class="top_details">
+                <p><span></span> (880)123 2500</p>
+                <div class="search">
+                    <form  method="get" action="{% url 'welcome:blog' %}">
+                        <input type="text" value="" placeholder="Search..." id="searchinput" name="Skey">
+                        <input type="submit" value="">
+                    </form>
+                    <div id="re"></div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <nav class="navbar navbar-default">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"> </span>
+                    <span class="icon-bar"> </span>
+                    <span class="icon-bar"> </span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse nav-wil" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="{% url 'welcome:index' %}">主页 <span class="sr-only">(current)</span></a></li>
+                    <li class="active"><a href="{% url 'welcome:about' %}">关于我们</a></li>
+                    <li><a href="{% url 'welcome:services' %}">服务介绍</a></li>
+                    <li><a href="{% url 'welcome:blog' %}">汽车信息</a></li>
+                    <li><a href="{% url 'welcome:gallery' %}">徳旭风采</a></li>
+                    <li><a href="{% url 'welcome:contact' %}">预约试驾</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<!---->
+<div class="about">
+	 <div class="container">
+         <h2>关于我们</h2>
+         <ol class="breadcrumb">
+             <li><a href="index.html">首页</a></li>
+             <li class="active">关于</li>
+         </ol>
+         <div class="about-grids">
+             <div class="col-md-4 about-pic">
+                 <img src="{% static 'welcome/images/pic3.jpg' %}" class="img-responsive" alt=""/>
+             </div>
+             <div class="col-md-8 about-info">
+                 <h3>关于<strong>徳旭4S</strong></h3>
+                 <p>徳旭大众汽车有限公司（以下简称徳旭4S）于1991年2月6日成立，是由中国第一汽车股份有限公司、德国大众汽车股份公司、奥迪汽车股份公司和大众汽车（中国）
+                     投资有限公司合资经营的大型乘用车生产企业，是我国第一个按经济规模起步建设的现代化乘用车生产企业。经过近30年的发展，徳旭大众产能布局已覆盖东北长春、
+                     西南成都、华南佛山、华东青岛以及华北天津，拥有轿车一厂、轿车二厂、轿车三厂、轿车四厂、轿车五厂、轿车六厂、动力总成事业部以及冲压中心八大专业生产厂。 </p>
+             </div>
+             <div class="clearfix"></div>
+         </div>
+         <div class="abt-btm-grids">
+             <div class="col-md-3 abt-sec span_1_of_4">
+                 <div class="num-heading">
+                     <div class="number">
+                         <figure><span>1</span></figure>
+                     </div>
+                     <div class="heading">
+                         <h4>严苟的质量把关</h4>
+                     </div>
+                     <div class="clearfix"></div>
+                 </div>
+                 <div class="heading-desc">
+                     <p>一汽-大众始终坚持将质量至上作为企业经营方针，将用户的满意和期望作为对质量始终不渝的追求，将“创·享 高品质”作为企业的核心品牌发展理念，同时持续开展以用户满意为重点的质量改进工作，不断规范服务流程，提升服务标准，全方位提高售前、售中和售后服务水平，为客户提供全过程、全方位的贴心服务并建立完善的客户关系管理体系。</p>
+                 </div>
+             </div>
+             <div class="col-md-3 abt-sec span_1_of_4">
+                 <div class="num-heading">
+                     <div class="number">
+                         <figure><span>2</span></figure>
+                     </div>
+                     <div class="heading">
+                         <h4>全面的产品序列</h4>
+                     </div>
+                     <div class="clearfix"></div>
+                 </div>
+                 <div class="heading-desc">
+                     <p>从建厂初期的一个品牌1款产品，发展到现在的奥迪、大众、捷达三大品牌20余款产品——奥迪A6L、奥迪A6L PHEV、奥迪Q5L、奥迪A4L、奥迪Q3、奥迪A3 Limousine、奥迪A3 Sportback、奥迪Q2L、迈腾、CC、探岳、探歌、速腾、高尔夫、高尔夫·嘉旅、蔚领、宝来以及捷达品牌产品，徳旭-大众已成为国内成熟的覆盖A、B、C级全系列乘用车型的生产企业。</p>
+                 </div>
+             </div>
+             <div class="col-md-3 abt-sec span_1_of_4">
+                 <div class="num-heading">
+                     <div class="number">
+                         <figure><span>3</span></figure>
+                     </div>
+                     <div class="heading">
+                         <h4>社会责任</h4>
+                     </div>
+                     <div class="clearfix"></div>
+                 </div>
+                 <div class="heading-desc">
+                     <p>徳旭-大众将成为国内最优秀的汽车合资企业作为公司的愿景，积极践行着“造价值经典汽车，创卓越出行服务，促人、车、社会和谐”的企业使命。在实现企业自身良好经济效益的同时，徳旭-大众积极履行社会责任。一方面，徳旭-大众在持续向消费者提供质量可靠的产品的同时，为地方经济发展和汽车市场繁荣贡献着自己的力量；另一方面，始终坚持环保和绿色理念，关注支持公益事业，积极倡导交通安全，并率先垂范，得到了用户的青睐、行业的拥戴和社会的认可。与此同时，企业品牌和产品品牌连年获得了政府、行业、媒体的诸多褒奖。 面对行业发展的新趋势，徳旭-大众结合现有战略体系，在2017年正式发布了企业“2025战略”。新的“2025战略”，充分把握外部环境的变化趋势，剖析企业自身情况，不仅关注业务发展，也将关注管理提升，承载起公司面向更长远未来的发展规划。</p>
+                 </div>
+             </div>
+             <div class="col-md-3 abt-sec span_1_of_4">
+                 <div class="num-heading">
+                     <div class="number">
+                         <figure><span>4</span></figure>
+                     </div>
+                     <div class="heading">
+                         <h4>企业文化</h4>
+                     </div>
+                     <div class="clearfix"></div>
+                 </div>
+                 <div class="heading-desc">
+                     <p>通过实施国内大学生招聘、海外招聘和社会招聘，徳旭-大众在技术、管理领域形成人才梯队和人才储备，同时尊重员工的个人发展意愿，保持员工能力和价值的不断提升，在企业内外树立了良好的雇主品牌形象，并得到了专业机构和社会公众的广泛认同。 至今，公司已连续10年获得Top Employers Institute 认证的“中国杰出雇主”认证，连续8年获得中华英才网评选的“全国大学生最佳雇主”汽车行业排名第一。</p>
+				 </div>	
+			 </div>
+             <div class="clearfix"></div>
+		 </div>	
+		 <div class="works">
+             <h3>我们的队伍</h3>
+             <div class="grid_4">
+                 <div class="text1">
+                     <img src="{% static 'welcome/images/t1.jpg' %}" alt="">
+                     <h4>孔小旭</h4>
+                     <p>北京航空航天大小经济管理学院本科生</p>
+                 </div>
+             </div>
+             <div class="grid_4">
+                 <div class="text1">
+                     <img src="{% static 'welcome/images/t2.jpg' %}" alt="">
+                     <h4>孙小泽</h4>
+                     <p>北京航空航天大小经济管理学院本科生</p>
+                 </div>
+             </div>
+             <div class="grid_4 span66">
+                 <div class="text1">
+                     <img src="{% static 'welcome/images/t3.jpg' %}" alt="">
+                     <h4>殷小博</h4>
+                     <p>北京航空航天大小经济管理学院本科生</p>
+                 </div>
+             </div>
+             <div class="grid_4">
+                 <div class="text1">
+                     <img src="{% static 'welcome/images/t4.jpg' %}" alt="">
+                     <h4>SDA</h4>
+                     <p>北京航空航天大小经济管理学院课程</p>
+                 </div>
+             </div>
+         </div>
+         <div class="clearfix"></div>
+     </div>
+</div>
+
+<!---->
+<div class="footer2">	
+    <div class="container">
+        <div class="ftr2-grids">
+            <div class="col-md-4 ftr2-grid1">
+                <h3>导航</h3>
+                <ul>
+                    <li><a href="{% url 'welcome:about' %}">关于我们</a></li>
+                    <li><a href="{% url 'welcome:services' %}">服务介绍</a></li>
+                    <li><a href="{% url 'welcome:blog' %}">汽车信息</a></li>
+					<li><a href="{% url 'welcome:gallery' %}">徳旭风采</a></li>
+					<li><a href="{% url 'welcome:contact' %}">预约试驾</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 ftr2-grid2">
+                <h3>最新推文</h3>
+                <div class="ftr2-grid">
+                    <p>徳旭4S服务质量很高，令人满意</p>
+                    <a href="#">1小时前</a>
+                </div>
+                <div class="ftr2-grid">
+                    <p>等待区有奶茶零食，很棒</p>
+                    <a href="#">3小时前</a>
+                </div>
+            </div>
+            <div class="col-md-4 ftr6-grid3">
+                <h3>咨询</h3>
+                <p>输入您的邮箱，我们的客服将在第一时间联系您</p>
+                <form>
+                    <input type="text" id="touchemail" name="email" class="text" value="Enter Email" onFocus="this.value = '';" onBlur="if (this.value == '') {this.value = 'Enter Email';}">
+                    <a id="touch" href="javascript:void(0);" value="Subscribe" class="more hvr-bounce-to-bottom" style="margin-top: 0px">提交</a>
+                </form>
+                <div class="social">
+                    <ul>
+                        <li><a href="https://www.facebook.com/"><i class="facebook"></i></a></li>
+                        <li><a href="https://twitter.com/"><i class="twitter"></i></a></li>
+                        <li><a href="https://dribbble.com/"><i class="dribble"></i></a></li>
+                        <li><a href="https://www.google.com/"><i class="google"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<!---->
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+{% extends "Sale/base.html" %}
+{% load static %}
+{% block css %}
+    {#    <link href="{% static 'adminlet/blog.css' %}" rel="stylesheet" type="text/css" />#}
+
+    <style type="text/css">
+
+        #purchase {
+            float: right;
+            color: darkblue;
+            font-size: 25px;
+        }
+    </style>
+{% endblock %}
+{% block script %}
+    <link href="{% static 'adminlet/blog.css' %}" rel="stylesheet" type="text/css"/>
+    <script>
+        function checkInput() {
+            var cusno = $('#inputNumber').val();
+            var result =0;
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: '{% url 'Sale:checkCusno' %}',
+                data: {'cusno': cusno},
+                dateType: "json",
+                async: false,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.status == 'success') {
+                        alert("已查找到该顾客");
+                        result = 1;
+                    } else if (data.status == 'fail') {
+                        {#$('#jsCompanyTips').html(data.msg);#}
+                        alert("顾客编号为空或错误,请重新输入");
+                        result = 0;
+                    }
+                },
+            });
+            if (result == 1) {
+                return true;
+            } else if (result == 0) {
+                {#$('#jsCompanyTips').html(data.msg);#}
+                {#alert("顾客编号为空或错误,请重新输入");#}
+                return false;
+            }
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="invoice p-3 mb-3">
+        <div class="container ">
+            <div class="row">
+                <div class="col-sm-8 blog-main">
+                    <div class="blog-post">
+                        <h2 class="blog-post-title">汽车信息</h2>
+                        <br>
+                        <h4>型号</h4>
+                        <strong>{{ carinfo.ctype }}</strong>
+                        <br><br>
+                        <h4>参考售价</h4>
+                        <strong>{{ carinfo.price }}</strong>
+                        <br><br>
+                        <h4>描述</h4>
+                        <strong>{{ carinfo.describe }}</strong>
+                        <br>
+                        {#                    <h5 class="blog-post-title">配图</h5>#}
+                        <div class="col-md-6 col-md-offset-3">
+                            <img src="{{ carinfo.image.url }}" width="400" height="250" class="featurette-image img-responsive center-block">
+                        </div>
+                        <br>
+                        <br>
+                        <button type="button" class="btn btn-tool" data-toggle="modal" id="purchase"
+                                data-target="#modal-info">
+                            <i class="fas fa-money-bill"></i>立即购买
+                        </button>
+                        <div class="modal fade" id="modal-info">
+                            <div class="modal-dialog">
+                                <div class="modal-content bg-info">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">购车信息</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form action="{% url "Sale:buyCar" carinfo.id %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <div>
+                                                <div class="form-group">
+                                                    <label for="inputNumber">顾客编号</label>
+                                                    <input type="text" id="inputNumber" name="inputNumber" class="form-control"
+                                                           id="inputNumber">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="Realprice">最终售价</label>
+                                                    <input type="text" name="Realprice" class="form-control"
+                                                           id="Realprice">
+                                                </div>
+                                                <img src="{% static "alipay.jpg" %}" width="200" height="280">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-outline-light"
+                                                    data-dismiss="modal">取消
+                                            </button>
+                                            <input type="submit" value="提交" class="btn btn-outline-light"
+                                                   onclick="return checkInput();">
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+                        <!-- /.modal -->
+                    </div>
+                </div><!-- /.blog-main -->
+                <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+                    <div class="sidebar-module sidebar-module-inset">
+                        <h4>品牌</h4>
+                        <p>{{ carinfo.band }}</p>
+                        <h4>库存状态</h4>
+
+                        {% if carinfo.inventory == 0 %}
+                            <td><label class="badge badge-danger">缺货</label></td>
+                        {% elif carinfo.inventory < 3 %}
+                            <td><label class="badge badge-warning">存货紧缺</label></td>
+                        {% else %}
+                            <td><label class="badge badge-success">充足</label></td>
+                        {% endif %}
+                    </div>
+                    <div class="feature_sec" style="margin-top: 30px">
+                        <div class="container">
+                            <div class="feature_head">
+                                <h3>其他</h3>
+                                <span></span>
+                            </div>
+                            <ul id="flexiselDemo3">
+                                <li>
+                                    <div class="biseller-column">
+                                        <a href="{% url 'Sale:details' 1 %}"><img
+                                                src="{% static 'welcome/images/pic6.jpg' %}" width="120" height="100" alt=""/></a>
+                                        <h4>宝来.纯电</h4>
+                                        <p>德系品质 忠于严谨</p>
+                                        {#                        <a class="more hvr-bounce-to-bottom" href="{% url 'blog' %}">了解更多</a>#}
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="biseller-column">
+                                        <a href="{% url 'Sale:details' 2 %}"><img
+                                                src="{% static 'welcome/images/pic5.jpg' %}" width="120" height="100" alt=""/></a>
+                                        <h4>C-TREK蔚领</h4>
+                                        <p>一见倾心的迷人</p>
+                                        {#                        <a class="more hvr-bounce-to-bottom" href="{% url 'blog' %}">了解更多</a>#}
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="biseller-column">
+                                        <a href="{% url 'Sale:details' 3 %}"><img
+                                                src="{% static 'welcome/images/pic4.jpg' %}" width="120" height="100" alt=""/></a>
+                                        <h4>探影</h4>
+                                        <p>真正的安全，不止一面</p>
+                                        {#                        <a class="more hvr-bounce-to-bottom" href="{% url 'blog' %}">了解更多</a>#}
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="biseller-column">
+                                        <a href="{% url 'Sale:details' 4 %}"><img
+                                                src="{% static 'welcome/images/pic8.jpg' %}" width="120" height="100" alt=""/></a>
+                                        <h4>迈腾GTE</h4>
+                                        <p>不一样，才像样</p>
+                                        <a class="more hvr-bounce-to-bottom" href="{% url 'Sale:carInfo' %}">了解更多</a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+{#                            <script type="text/javascript">#}
+{#                                $(window).load(function () {#}
+{#                                    $("#flexiselDemo3").flexisel({#}
+{#                                        visibleItems: 4,#}
+{#                                        animationSpeed: 1000,#}
+{#                                        autoPlay: true,#}
+{#                                        autoPlaySpeed: 3000,#}
+{#                                        pauseOnHover: true,#}
+{#                                        enableResponsiveBreakpoints: true,#}
+{#                                        responsiveBreakpoints: {#}
+{#                                            portrait: {#}
+{#                                                changePoint: 480,#}
+{#                                                visibleItems: 2#}
+{#                                            },#}
+{#                                            landscape: {#}
+{#                                                changePoint: 640,#}
+{#                                                visibleItems: 2#}
+{#                                            },#}
+{#                                            tablet: {#}
+{#                                                changePoint: 768,#}
+{#                                                visibleItems: 3#}
+{#                                            }#}
+{#                                        }#}
+{#                                    });#}
+{#                                });#}
+{#                            </script>#}
+                        </div>
+                    </div>
+                </div><!-- /.blog-sidebar -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div>
+{% endblock %}

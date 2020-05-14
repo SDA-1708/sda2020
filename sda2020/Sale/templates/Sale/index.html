@@ -1,0 +1,276 @@
+{% extends 'Sale/base.html' %}
+{% load my_filters %}
+{% load static %}
+{% block title %}销售部门{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{% endblock %}
+
+{#{% block usernow %}{% endblock %}#}
+{#{% block mainsidebar %}{% endblock %}#}
+{#{% block sidebar_right %}{% endblock %}#}
+
+{% block breadcrumb %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <small id="timer"></small>
+
+            <script>
+                setInterval("timer.innerHTML=new Date().toLocaleString();");
+            </script>
+        </h1>
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">预约提醒</h3>
+                <div class="card-tools">
+                    <!-- Buttons, labels, and many other things can be placed here! -->
+                    <!-- Here is a label for example -->
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                </div>
+                <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div class="timeline">
+                    <!-- Timeline time label -->
+                    {% for appo in appoment %}
+                        <div class="time-label">
+                            <span class="bg-green">{{ appo.id.timeatwork }}</span>
+                        </div>
+                        <div>
+                            <!-- Before each timeline item corresponds to one icon on the left scale -->
+                            <i class="fas fa-envelope bg-blue"></i>
+                            <!-- Timeline item -->
+                            <div class="timeline-item">
+                                <!-- Time -->
+                                <span class="time"><i class="fas fa-clock"></i>
+                                    <small id="timediff"></small>
+                                    <script>
+                                        {#setInterval("timediff.innerHTML=DateDifference('{{ appo.id.timeatwork }}',new Date()););#}
+                                    </script>
+                                </span>
+                                <!-- Header. Optional -->
+                                <h3 class="timeline-header"><a
+                                        href="#">{{ appo.cusno.cname }}|电话：{{ appo.cusno.tel }}</a> 预约了您</h3>
+                                <!-- Body -->
+                                <div class="timeline-body">
+                                    <strong>预约内容：</strong>{{ appo.appocontent }}
+                                </div>
+                                <!-- Placement of additional controls. Optional -->
+                                {#                                <div class="timeline-footer">#}
+                                {#                                    <a class="btn btn-primary btn-sm">Read more</a>#}
+                                {#                                    <a class="btn btn-danger btn-sm">Delete</a>#}
+                                {#                                </div>#}
+                            </div>
+                        </div>
+                        <!-- The last icon means the story is complete -->
+                    {% endfor %}
+
+
+                    <div class="time-label">
+                        <span class="bg-yellow">需要回访的已完成订单</span>
+                    </div>
+                    <div>
+                        <!-- Before each timeline item corresponds to one icon on the left scale -->
+                        <i class="fas fa-envelope bg-blue"></i>
+                        <!-- Timeline item -->
+                        <div class="timeline-item">
+
+                            <div class="timeline-body">
+                                {% for order in orders %}
+                                    <a class="btn btn-danger btn-sm" href="{% url 'Sale:order'%}">
+                                        {{ order.oid }}</a>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- The last icon means the story is complete -->
+
+
+                    <div>
+                        <i class="fas fa-clock bg-gray"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                未来一周内的预约提醒
+            </div>
+            <!-- /.card-footer -->
+
+        </div>
+        <!-- /.card -->
+    </section>
+{% endblock %}
+
+{% block content %}
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h2>顾客订单</h2>
+
+                    <p>Customer Orders</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-bag"></i>
+                </div>
+                <a href="{% url 'Sale:order' %}" class="small-box-footer">Go <i
+                        class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h2>车辆信息</h2>
+
+                    <p>Search Cars</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-model-s"></i>
+                </div>
+                <a href="{% url 'Sale:carInfo' %}" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h2>客户信息</h2>
+
+                    <p>Customer Information</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-person-add"></i>
+                </div>
+                <a href="{% url 'Sale:cusinfo' %}" class="small-box-footer">Go <i
+                        class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h2>维修保养</h2>
+
+                    <p>Fault Repairing</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-wrench"></i>
+                </div>
+{#                <a href="{% url 'Sale:fault' %}" class="small-box-footer">Go <i#}
+{#                        class="fas fa-arrow-circle-right"></i></a>#}
+                <a class="small-box-footer" data-toggle="modal" id="purchase"
+                        data-target="#modal-info">Go <i
+                        class="fas fa-arrow-circle-right"></i>
+                </a>
+                <div class="modal fade" id="modal-info">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-info">
+                            <div class="modal-header">
+                                <h4 class="modal-title">顾客信息</h4>
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form action="{% url "Sale:fault" %}" method="post">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="inputNumber">提车单号:</label>
+                                        <input type="text" name="inputNumber" class="form-control"
+                                               id="inputNumber">
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-outline-light"
+                                            data-dismiss="modal">取消
+                                    </button>
+                                    <input type="submit" value="提交"
+                                           class="btn btn-outline-light" onclick="return checkInput();">
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+        <!-- ./col -->
+    </div>
+    <!-- /.row -->
+{% endblock %}
+
+{% block script %}
+    <script>
+        function DateDifference(faultDate, completeTime) {
+            // let d1 = new Date(faultDate);
+            // let d2 = new Date(completeTime);
+            var stime = new Date(faultDate).getTime();
+            var etime = new Date(completeTime).getTime();
+            var usedTime = etime - stime;  //两个时间戳相差的毫秒数
+            var days = Math.floor(usedTime / (24 * 3600 * 1000));
+            //计算出小时数
+            var leave1 = usedTime % (24 * 3600 * 1000);    //计算天数后剩余的毫秒数
+            var hours = Math.floor(leave1 / (3600 * 1000));
+            //计算相差分钟数
+            var leave2 = leave1 % (3600 * 1000);        //计算小时数后剩余的毫秒数
+            var minutes = Math.floor(leave2 / (60 * 1000));
+
+            var time = days + "天" + hours + "时" + minutes + "分";
+            //var time = days;
+            alert(time);
+            return time;
+        }
+    </script>
+    <script>
+        function checkInput() {
+            var pickid=$('#inputNumber').val();
+            var result=0;
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: '{% url 'Sale:checkPick' %}',
+                    data: {'pickid': pickid},
+                    dateType: "json",
+                    async: false,
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            result=1;
+                            //window.location.reload();//刷新当前页面.
+                        } else if (data.status == 'fail') {
+                            {#$('#jsCompanyTips').html(data.msg);#}
+                            result=0;
+
+                        }
+                    },
+                });
+            if (result == 1) {
+                alert("已查找到该提车单号");
+                return true;
+            } else if (result == 0) {
+                {#$('#jsCompanyTips').html(data.msg);#}
+                {#alert("顾客编号为空或错误,请重新输入");#}
+                alert("提车单号为空或错误");
+                return false;
+            }
+        }
+    </script>
+
+{% endblock %}

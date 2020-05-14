@@ -1,0 +1,107 @@
+{% extends 'repair.html' %}
+{% load static %}
+{% block usernow %}
+<!-- Sidebar user panel (optional) -->
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+<div class="image">
+  <img src="{% static 'adminlet/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+</div>
+<div class="info">
+  <a href="#" class="d-block">{{ w_name }}</a>
+</div>
+</div>
+{% endblock %}
+{% block mainsidebar %}
+<li class="nav-item">
+<a href="{% url 'purchase:car_unconfirmed' %}" class="nav-link active">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    返回
+  </p>
+</a>
+</li>
+{% endblock %}
+{% block content %}
+<div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">新增整车采购单页面</h3>
+
+                <div class="card-tools">
+                  <div class="input-group input-group-sm" style="width: 150px;">
+                  </div>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                  <thead>
+                    <tr>
+                      <th>车型选择</th>
+                      <th>采购数量</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <form action="{% url 'purchase:car_add' %}" method="POST">
+                            {% csrf_token %}
+                      <td class="text-center">
+                        <input type="text" name="num" value="1">
+                      </td>
+                      <td class="form-group">
+                          <select class="form-control custom-select" name="c_id">
+                        {% for c in car  %}
+                                <option value='{{ c.id }}'>{{ c.id }}-{{ c.band }}-{{ c.ctype }}</option>
+                        {% endfor %}
+                    </select></td>
+                      <td>
+                    <div>
+                        <div style="float:right">
+                            <a href="{% url 'purchase:car_unconfirmed' %}">
+                            <button type="button" class="btn btn-block btn-danger btn-lg">取消</button></a></div>
+                        <div style="float:right">
+                            <input type="submit" value="确认" class="btn btn-success btn-lg float-right"></div>
+                    </div>
+                </td>
+                          </form>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+{% endblock %}
+
+
+
+
+{% block script %}
+<!-- DataTables -->
+<script>
+function myFunction(a) {
+  if(a==='未领取')
+  {alert('先去领取零件才能完成维修!!!');}
+  else {alert('已完成派工单');}
+}
+</script>
+<script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'adminlet/dist/js/demo.js' %}"></script>
+<!-- page script -->
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+{% endblock %}

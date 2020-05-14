@@ -1,0 +1,110 @@
+{% extends 'HumanResources/base.html' %}
+{% load static %}
+{% block title %}财务部门{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{% endblock %}
+
+{#{% block usernow %}{% endblock %}#}
+{#{% block mainsidebar %}{% endblock %}#}
+{#{% block sidebar_right %}{% endblock %}#}
+
+{% block breadcrumb %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <small id="timer"></small>
+
+            <script>
+                setInterval("timer.innerHTML=new Date().toLocaleString();");
+            </script>
+        </h1>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="card card-primary card-tabs">
+            <div class="card-header p-0 pt-1">
+                <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="server-tab" data-toggle="pill"
+                           href="#server-content" role="tab" aria-controls="server"
+                           aria-selected="true">服务顾问</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="repairer-tab" data-toggle="pill"
+                           href="#repairer-content" role="tab" aria-controls="repairer"
+                           aria-selected="false">维修员工</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="custom-tabs-one-tabContent">
+                    <div class="tab-pane fade show active" id="server-content" role="tabpanel"
+                         aria-labelledby="server-tab">
+                        <table id="example_0" class="table table-bordered table-striped">
+                            <thead>
+                            <tr class="text-center">
+                                <th class="text-center">员工编号</th>
+                                <th class="text-center">员工姓名</th>
+                                <th class="text-center">职位</th>
+                                <th class="text-center">累计订单</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for worker in servers %}
+                                <tr>
+                                    <td class="text-center">{{ worker.wid.wid }}</td>
+                                    <td class="text-center">{{ worker.wname }}</td>
+                                    <td class="text-center">{{ worker.postion }}</td>
+                                    <td class="text-center">{{ worker.order_finish }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="repairer-content" role="tabpanel"
+                         aria-labelledby="repairer-tab">
+                        <table id="example_1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr class="text-center">
+                                <th class="text-center">员工编号</th>
+                                <th class="text-center">员工姓名</th>
+                                <th class="text-center">职位</th>
+                                <th class="text-center">工作负荷</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for worker in repairers %}
+                                <tr>
+                                    <td class="text-center">{{ worker.wid.wid }}</td>
+                                    <td class="text-center">{{ worker.wname }}</td>
+                                    <td class="text-center">{{ worker.postion }}</td>
+                                    <td class="text-center">{{ worker.workload }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#example_0').DataTable();
+            $('#example_1').DataTable();
+        });
+    </script>
+{% endblock %}

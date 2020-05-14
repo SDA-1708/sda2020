@@ -1,0 +1,105 @@
+{% extends 'HumanResources/base.html' %}
+{% load static %}
+{% block title %}编辑员工 | {{ worker_edited.wid }}{% endblock %}
+
+{% block css %}
+{% endblock %}
+{% block content %}
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">编辑员工 | {{ worker_edited.wid }}</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                    <i class="fas fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form action="{% url "HumanResources:edition" worker_edited.wid %}" method="post">
+                {% csrf_token %}
+                {#                {{ form.non_field_errors }}#}
+                <div class="form-group">
+                    <label for="inputNumber">员工编号</label>
+                    <input type="text" name="inputNumber" class="form-control" value={{ worker_edited.wid }} disabled>
+                </div>
+                <div class="form-group">
+                    {#                    {{ form.inputName.errors }}#}
+                    <label for="inputName">姓名</label>
+                    <input id="inputName" type="text" name="inputName" class="form-control" value={{ worker_edited.wname }}>
+                    {#                    {{ form.inputName }}#}
+                </div>
+                <div class="form-group">
+                    {#                {{ form.inputDept.errors }}#}
+                    <label for="inputDept">部门</label>
+                    <select name="inputDept" class="form-control custom-select">
+                        <option {% if worker_edited.dept == '销售' %} selected="selected" {% endif %}>销售</option>
+                        <option {% if worker_edited.dept == '维修' %} selected="selected" {% endif %}>维修</option>
+                        <option {% if worker_edited.dept == '仓库' %} selected="selected" {% endif %}>仓库</option>
+                        <option {% if worker_edited.dept == '财务' %} selected="selected" {% endif %}>财务</option>
+                        <option {% if worker_edited.dept == '人事' %} selected="selected" {% endif %}>人事</option>
+                    </select>
+                    {#                    {{ form.inputDept }}#}
+                </div>
+                <div class="form-group">
+                    {#                {{ form.inputpostion.errors }}#}
+                    <label for="inputpostion">职位</label>
+                    <select name="inputpostion" class="form-control custom-select">
+                        <option {% if worker_edited.postion == '经理' %} selected="selected" {% endif %}>经理</option>
+                        <option {% if worker_edited.postion == '总管' %} selected="selected" {% endif %}>总管</option>
+                        <option {% if worker_edited.postion == '职员' %} selected="selected" {% endif %}>职员</option>
+                    </select>
+                    {#                    {{ form.inputpostion }}#}
+                </div>
+                <div class="col-md-3 col-md-offset-10" style="float: right">
+                    <input type="submit" value="提交" class="btn btn-success btn-lg" onclick="return checkInput();">
+                    <a href="{% url 'HumanResources:index' %}" class="btn btn-secondary btn-lg">取消</a>
+{#                    <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#modal-danger">#}
+{#                        删除#}
+{#                    </button>#}
+                </div>
+            </form>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+    <div class="modal fade" id="modal-danger">
+        <div class="modal-dialog">
+            <div class="modal-content bg-danger">
+                <div class="modal-header">
+                    <h4 class="modal-title">删除该员工</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>删除无法撤回，你确定要删除么？&hellip;</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-light" data-dismiss="modal">取消</button>
+                    <a href="{% url 'HumanResources:delete' worker_edited.wid %}">
+                        <button type="button" class="btn btn-outline-light">确定</button>
+                    </a>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+{% endblock %}
+
+{% block script %}
+    <script>
+        function checkInput() {
+            var name = document.getElementById("inputName").value;
+            if (name == "") {
+                alert("姓名不能为空");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
+{% endblock %}

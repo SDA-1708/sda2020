@@ -1,0 +1,162 @@
+{% extends 'storage.html' %}
+{% load static %}
+
+{% block mainsidebar %}
+<li class="nav-item">
+<a href="{% url 'storage:pickup' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    提车单查看
+  </p>
+</a>
+</li>
+<li class="nav-item">
+<a href="{% url 'storage:co_use' %}" class="nav-link active">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    零件准备单
+  </p>
+</a>
+</li>
+<li class="nav-item has-treeview">
+<a href="#" class="nav-link">
+  <i class="nav-icon fas fa-tachometer-alt"></i>
+  <p>
+    采购单入库确认
+    <i class="right fas fa-angle-left"></i>
+  </p>
+</a>
+<ul class="nav nav-treeview">
+  <li class="nav-item">
+    <a href="{% url 'storage:car_purchase' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>整车采购单</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'storage:co_purchase' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>零件采购单</p>
+    </a>
+  </li>
+</ul>
+</li>
+<li class="nav-item has-treeview">
+<a href="#" class="nav-link">
+  <i class="nav-icon fas fa-tachometer-alt"></i>
+  <p>
+    零件信息查询
+    <i class="right fas fa-angle-left"></i>
+  </p>
+</a>
+<ul class="nav nav-treeview">
+  <li class="nav-item">
+    <a href="{% url 'storage:batch' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>按批次查询</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'storage:component' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>按种类查询</p>
+    </a>
+  </li>
+</ul>
+</li>
+<li class="nav-item">
+<a href="{% url 'storage:car' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    整车信息查询
+  </p>
+</a>
+</li>
+<li class="nav-item">
+<a href="{% url 'storage:welcome' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    员工个人信息
+  </p>
+</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="col-sm-6">
+            <h1>零件使用单</h1>
+          </div>
+<div class="card-header">
+              <h3 class="card-title">一张蓝图绘到底，撸起袖子加油干</h3>
+            </div>
+<div class="card-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>派工单ID</th>
+                  <th>零件使用</th>
+                  <th>零件状态</th>
+                  <th>确认领取</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for work in works %}
+                <tr>
+                    <td>{{ work.wsid }}</td>
+                    <td><div class="card card-primary collapsed-card">
+              <div class="card-header">
+                <h3 class="card-title">零件详情</h3>
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <!-- /.card-tools -->
+              </div>
+              <div class="card-body">
+                {% for co in work.com %}
+                    名称:&nbsp;{{ co.coname }}&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+                    数量:&nbsp;{{ co.conum }}<br/>
+                    {% endfor %}
+              </div>
+            </div></td>
+                    <td>{{ work.compo_use_state }}</td>
+                    <td><a href="{% url 'storage:co_confirm' work.wsid%} ">
+                        <button type="button" onclick="myFunction()" class="btn btn-block btn-success btn-lg">确认领取</button></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                  <th>派工单ID</th>
+                  <th>零件使用</th>
+                  <th>零件状态</th>
+                  <th>确认领取</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+{% endblock %}
+
+{% block script %}
+<!-- DataTables -->
+<script>
+function myFunction() {
+  alert('已领取零件');
+}
+</script>
+<script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'adminlet/dist/js/demo.js' %}"></script>
+<!-- page script -->
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+{% endblock %}

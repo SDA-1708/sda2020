@@ -1,0 +1,131 @@
+{% extends 'repair.html' %}
+{% load static %}
+{% block usernow %}
+<!-- Sidebar user panel (optional) -->
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+<div class="image">
+  <img src="{% static 'adminlet/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+</div>
+<div class="info">
+  <a href="#" class="d-block">{{ w_name }}</a>
+</div>
+</div>
+{% endblock %}
+{% block mainsidebar %}
+<li class="nav-item has-treeview menu-open">
+<a href="#" class="nav-link active">
+  <i class="nav-icon fas fa-tachometer-alt"></i>
+  <p>
+    派工单查询界面
+    <i class="right fas fa-angle-left"></i>
+  </p>
+</a>
+<ul class="nav nav-treeview">
+  <li class="nav-item">
+    <a href="{% url 'repair:un_worksheet' %}" class="nav-link active">
+      <i class="far fa-circle nav-icon"></i>
+      <p>未完成派工单</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'repair:out_worksheet' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>缺货派工单</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'repair:ed_worksheet' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>已完成派工单</p>
+    </a>
+  </li>
+</ul>
+</li>
+<li class="nav-item">
+<a href="{% url 'repair:user' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    个人信息
+  </p>
+</a>
+</li>
+{% endblock %}
+{% block content %}
+<div class="col-sm-6">
+            <h1>未完成的派工单</h1>
+          </div>
+<div class="card-header">
+              <h3 class="card-title">一张蓝图绘到底，撸起袖子加油干</h3>
+            </div>
+<div class="card-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>派工单ID</th>
+                  <th>派工单状态</th>
+                  <th>零件领取情况</th>
+                  <th>故障名称</th>
+                  <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for work in w_worker %}
+                <tr>
+                    <td>{{ work.wsid }}</td>
+                    <td>{{ work.state }}</td>
+                    <td>{{ work.comuse }}</td>
+                    <td>{{ work.faultname }}</td>
+                    <td><a class="btn btn-app" href="{% url 'repair:new_fault' work.wsid%}">
+                  <i class="fas fa-edit"></i> 新增故障
+                </a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a type="button"  href="{% url 'repair:confirm' work.wsid %}" class="btn btn-app">
+                  <i onclick="myFunction('{{ work.comuse }}')" class="fas fa-play"></i> 完成派工单
+                </a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a type="button"  href="{% url 'repair:worksheet_info' work.wsid %}" class="btn btn-app">
+                  <i class="fas fa-inbox"></i> 订单详情
+                </a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                  <th>派工单ID</th>
+                  <th>派工单状态</th>
+                  <th>零件领取情况</th>
+                  <th>故障名称</th>
+                  <th>操作</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+{% endblock %}
+
+{% block script %}
+<!-- DataTables -->
+<script>
+function myFunction(a) {
+  if(a==='未领取')
+  {alert('先去领取零件才能完成维修!!!');}
+  else {alert('已完成派工单');}
+}
+</script>
+<script src="{% static 'adminlet/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'adminlet/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'adminlet/dist/js/demo.js' %}"></script>
+<!-- page script -->
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+{% endblock %}

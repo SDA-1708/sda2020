@@ -1,0 +1,131 @@
+{#{% extends "welcome/base.html" %}#}
+{#{% load static %}#}
+{#{% block title %} 注册 {% endblock title %}#}
+{#{% block content %}#}
+{#<div class="container">#}
+{#    <div class="row">#}
+{#        <div class="col-12">#}
+{#            <form class="form-register" method="post" action="{% url 'register' %}">#}
+{#            {% if message %}#}
+{#                <div class ="alert alert-warning">{{ message }}</div>#}
+{#            {% endif %}#}
+{#                {% csrf_token %}#}
+{#                {% for field in register_obj %}#}
+{#                    <div class="form-group" >#}
+{#                        <label for="{{ field.id_for_label }}"#}
+{#                               class="col-xs-3 control-label" >{{ field.label }}</label>#}
+{#                        {{ field }}#}
+{#                        <div style="height: 10px;" class="text-danger">{{ field.errors.0 }}</div>#}
+{##}
+{#                    </div>#}
+{#                {% endfor %}#}
+{#                <!-- 提交按钮 -->#}
+{#                <div class="form-group">#}
+{#                    <div class="col-sm-7  col-xs-offset-3">#}
+{#                        <span class="col-xs-10 text-success text-center"#}
+{#                              style="line-height: 200%">已有账号，请<a href="{% url 'login' %}">登录</a>！</span>#}
+{#                        <input type="submit" class="btn btn-success btn-sm col-xs-2 pull-right">#}
+{#                    </div>#}
+{#                </div>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{#{% endblock content %}#}
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登陆</title>
+{#    <link href="favicon.ico" rel="shortcut icon" />#}
+    <link href="{% static 'welcome/css/bootstrap.css' %}" rel='stylesheet' type='text/css' />
+
+    <script src="{% static 'welcome/js/jquery.min.js' %}"></script>
+    <script src="{% static 'welcome/js/bootstrap.js' %}"></script>
+
+    <style type="text/css">
+        input[name="captcha_1"]{
+{#            height:33.99px;#}
+{#            width: 468px;#}
+            width: 468px;
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body style=" background: url(http://global.bing.com/az/hprichbg/rb/RavenWolf_EN-US4433795745_1920x1080.jpg) no-repeat center center fixed; background-size: 100%;">
+    <div class="modal-dialog" style="margin-top: 10%;">
+        <div class="modal-content">
+            <form method="post" action="{% url 'welcome:register' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="myModalLabel">欢迎注册</h4>
+                    {% if message %}
+                        {% if status != '1' %}
+                            <div class="alert alert-danger" role="alert">
+                                <a href="#" class="close" data-dismiss="alert">&times;</a>
+                                {{ message }}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success" role="alert">
+                                <a href="#" class="close" data-dismiss="alert">&times;</a>
+                                {{ message }}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="modal-body" id = "model-body">
+                    <div class="form-group">
+                        {{ register_obj.username }}
+{#                        <input type="text" name="username" class="form-control" placeholder="用户名" autocomplete="off">#}
+                        {{ register_obj.username.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.password }}
+                        {{ register_obj.password.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.r_password }}
+{#                        <input type="password" name="password" class="form-control" placeholder="密码" autocomplete="off">#}
+                        {{ register_obj.r_password.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.name }}
+                        {{ register_obj.name.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.gender }}
+                        {{ register_obj.gender.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.email }}
+                        {{ register_obj.email.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.phone }}
+                        {{ register_obj.phone.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ register_obj.address }}
+                        {{ register_obj.address.errors }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary form-control">注册</button>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default form-control" onclick="javascript:window.location.href='{% url 'welcome:login' %}'">已有账号?去登陆</button>
+                    </div>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+
+</body>
+</html>

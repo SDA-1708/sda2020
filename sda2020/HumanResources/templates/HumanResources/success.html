@@ -1,0 +1,20 @@
+{% extends "HumanResources/base.html" %}
+
+{% block content %}
+    {% if result == 'success' %}
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5><i class="icon fas fa-check"></i> 成功!</h5>
+            {{ success_inform }}
+        </div>
+    {% endif %}
+    {% if result == 'fail' %}
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5><i class="icon fas fa-ban"></i> 失败!</h5>
+            {{ success_inform }}
+        </div>
+    {% endif %}
+    <a href="{% url 'HumanResources:index' %}" class="btn btn-secondary btn-lg"
+       style="float:right">返回</a>
+{% endblock %}

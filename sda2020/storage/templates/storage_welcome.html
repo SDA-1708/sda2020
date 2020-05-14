@@ -1,0 +1,116 @@
+{% extends 'storage.html' %}
+{% load static %}
+{% block mainsidebar %}
+<li class="nav-item">
+<a href="{% url 'storage:pickup' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    提车单查看
+  </p>
+</a>
+</li>
+<li class="nav-item">
+<a href="{% url 'storage:co_use' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    零件准备单
+  </p>
+</a>
+</li>
+<li class="nav-item has-treeview">
+<a href="#" class="nav-link">
+  <i class="nav-icon fas fa-tachometer-alt"></i>
+  <p>
+    采购单入库确认
+    <i class="right fas fa-angle-left"></i>
+  </p>
+</a>
+<ul class="nav nav-treeview">
+  <li class="nav-item">
+    <a href="{% url 'storage:car_purchase' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>整车采购单</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'storage:co_purchase' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>零件采购单</p>
+    </a>
+  </li>
+</ul>
+</li>
+<li class="nav-item has-treeview">
+<a href="#" class="nav-link">
+  <i class="nav-icon fas fa-tachometer-alt"></i>
+  <p>
+    零件信息查询
+    <i class="right fas fa-angle-left"></i>
+  </p>
+</a>
+<ul class="nav nav-treeview">
+  <li class="nav-item">
+    <a href="{% url 'storage:batch' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>按批次查询</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'storage:component' %}" class="nav-link">
+      <i class="far fa-circle nav-icon"></i>
+      <p>按种类查询</p>
+    </a>
+  </li>
+</ul>
+</li>
+<li class="nav-item">
+<a href="{% url 'storage:car' %}" class="nav-link">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    整车信息查询
+  </p>
+</a>
+</li>
+<li class="nav-item">
+<a href="{% url 'storage:welcome' %}" class="nav-link active">
+  <i class="nav-icon fas fa-th"></i>
+  <p>
+    员工个人信息
+  </p>
+</a>
+</li>
+{% endblock %}
+{% block content %}
+<div class="col-md-4">
+            <!-- Widget: user widget style 2 -->
+            <div class="card card-widget widget-user-2">
+              <!-- Add the bg color to the header using any of the bg-* classes -->
+              <div class="widget-user-header bg-warning">
+                <div class="widget-user-image">
+                  <img class="img-circle elevation-2" src="{% static 'adminlet/dist/img/user7-128x128.jpg' %}" alt="User Avatar">
+                </div>
+                <!-- /.widget-user-image -->
+                <h3 class="widget-user-username">{{ w_name }}</h3>
+                <h5 class="widget-user-desc">员工号{{ w_id }}</h5>
+              </div>
+              <div class="card-footer p-0">
+                <ul class="nav flex-column">
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      部门 <span class="float-right badge bg-primary">{{ w_dept }}</span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      职位 <span class="float-right badge bg-info">{{ w_post }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- /.widget-user -->
+          </div>
+{% endblock %}
+{% block script %}
+    <script src={% static "adminlet/dist/js/demo.js" %}></script>
+{% endblock %}
